@@ -189,6 +189,18 @@ button.plain:hover{color:var(--accent);border-color:var(--accent)}
   #mascot .face{width:96px;height:96px;font-size:44px}
 }
 .loading{text-align:center;padding:80px 20px;color:var(--subtle);font-size:16px;line-height:2}
+
+/* v0.7：轻提示与坑点卡结构化 */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111827;color:#f8fafc;
+  border-radius:10px;padding:10px 20px;font-size:14px;z-index:40;box-shadow:0 8px 24px rgba(0,0,0,.3);
+  animation:msgIn .25s ease}
+.card-panel .warnbar{height:6px;border-radius:4px;margin:-12px -12px 14px;
+  background:linear-gradient(90deg,#ef4444,#f59e0b)}
+.defense-box{background:#f8fafc;border-left:4px solid #3b82f6;border-radius:0 8px 8px 0;
+  padding:12px 16px;margin:12px 0}
+.defense-title{font-weight:700;font-size:14px;color:#1e40af;margin-bottom:6px}
+.defense-item{font-size:15px;line-height:1.9}
+.mystery{color:#9ca3af}
 </style>
 </head>
 <body>
@@ -199,6 +211,7 @@ button.plain:hover{color:var(--accent);border-color:var(--accent)}
   <div class="face" id="m-face">🙂</div>
   <div class="name">小D</div>
 </div>
-<script src="engine.js?v=4"></script>
+<script src="rules.js"></script>
+<script src="engine.js?v=7"></script>
 </body>
 </html>

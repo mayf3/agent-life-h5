@@ -1,0 +1,22 @@
+name: Rules regression tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run rules regression tests
+        run: node --test rules.test.mjs
+      - name: Headless full-run smoke (both scenarios)
+        run: |
+          node simulate.mjs vibe_coding random 1 > /dev/null
+          node simulate.mjs legacy_code random 1 > /dev/null
+          echo "两场景完整对局跑通"
