@@ -21,9 +21,28 @@ let state = null;
 let currentEvent = null;
 let pendingGoto = "";
 let probeUsed = new Set();
-let skipType = false; // 点击画面跳过打字/逐条动画
+let skipType = false; // 点击聊天区跳过打字/逐条动画
 let lastStats = null;
 let rngState = 0;
+
+// 跨局收集持久化（localStorage）——H5 版的 user://collection.json 等价物
+const COLL_KEY = "agent-life-cards";
+function collLoad() {
+  try { return JSON.parse(localStorage.getItem(COLL_KEY) || "{}"); } catch { return {}; }
+}
+function collSave(obj) {
+  try { localStorage.setItem(COLL_KEY, JSON.stringify(obj)); } catch { /* 隐私模式等场景忽略 */ }
+}
+function collUnlock(cardId) {
+  const c = collLoad();
+  if (!c[cardId]) { c[cardId] = true; collSave(c); }
+}
+function collUnlockMany(ids) {
+  const c = collLoad();
+  let changed = false;
+  for (const id of ids) if (!c[id]) { c[id] = true; changed = true; }
+  if (changed) collSave(c);
+}
 
 function rng() {
   rngState |= 0; rngState = (rngState + 0x6D2B79F5) | 0;
@@ -278,7 +297,7 @@ function onChoice(choiceId) {
   const choice = (currentEvent.choices || []).find((c) => c.id === choiceId);
   if (!choice) return;
   applyEffects(choice.effects, st);
-  if (choice.card) st.unlocked[choice.card] = true;
+  if (choice.card) { st.unlocked[choice.card] = true; collUnlock(choice.card); }
   const t0 = st.turn + 1;
   st.ledger.push({ turn: t0, title: currentEvent.title, choice: choice.text });
   for (const f of choice.followups || []) {
@@ -365,7 +384,9 @@ function showEnding() {
   stats.append(cell("回合", st.turn));
   for (const k of Object.keys(STAT_NAMES)) stats.append(cell(STAT_NAMES[k], st.stats[k]));
   p.append(stats);
-  p.append(el("p", "", `坑点图鉴 ${Object.keys(st.unlocked).length}/${Object.keys(DB.cards).length}`));
+  const coll = collLoad();
+  const totalUnlocked = Object.keys(DB.cards).filter((cid) => st.unlocked[cid] || coll[cid]).length;
+  p.append(el("p", "", `坑点图鉴 ${totalUnlocked}/${Object.keys(DB.cards).length}（跨局累计）`));
   const ledger = el("div", "ledger");
   const ledgerText = st.ledger.slice(-5).map((e) => `第${e.turn}回合｜${e.title} → ${e.choice}`).join("<br>");
   if (ledgerText) ledger.innerHTML = "本局关键抉择：<br>" + ledgerText;
@@ -407,9 +428,10 @@ function showMenu() {
     p.append(el("div", "tag", "COLLECTION // 收集"));
     p.append(el("h2", "", "坑点图鉴 · 事故档案"));
     let unlocked = 0;
+    const coll = collLoad();
     for (const cid of Object.keys(DB.cards)) {
       const card = DB.cards[cid];
-      const has = state && state.unlocked[cid];
+      const has = (state && state.unlocked[cid]) || coll[cid];
       if (has) unlocked++;
       const d = el("p", "", has
         ? `<b>${card.icon || ""} ${card.name}</b>（${card.severity}）：${card.essence}`
