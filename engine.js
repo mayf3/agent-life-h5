@@ -1,5 +1,7 @@
-// H5 精简引擎 v3——语义对齐 docs/engine-spec.md v1.2 子集，呈现层带打字机/逐条出现/头像/编号选项。
-// 内容与 Godot 版共用 data/*.json。
+// H5 精简引擎 v4——语义对齐 docs/engine-spec.md v1.2 子集。
+// 呈现层：逐条出现+打字机（可点击跳过）、结算锁定演出、数值胶囊进度/计数/震动/飘字、
+// 危机警报呼吸层、菜单视差漂浮 emoji、看板娘呼吸/果冻/情绪光晕/破折号停顿吐槽。
+// 内容与 Godot 版共用 data/*.json（语义权威 docs/engine-spec.md v1.2）。
 "use strict";
 
 const $ = (sel) => document.querySelector(sel);
@@ -14,25 +16,35 @@ const clamp = (v) => Math.max(0, Math.min(100, v));
 
 const STAT_NAMES = { money: "资金", progress: "进度", quality: "质量", sanity: "心态", reputation: "信誉" };
 const MOOD_FACES = { normal: "🙂", happy: "😄", smug: "😏", worry: "😟", panic: "😱", cheer: "🥳" };
-const WHO_BADGE = { user: { face: "🧑‍💻", cls: "user" }, agent: { face: "🤖", cls: "agent" }, system: { face: "📣", cls: "system" } };
+const MOOD_RING = { normal: "rgba(37,99,235,.25)", happy: "rgba(16,185,129,.25)", smug: "rgba(139,92,246,.28)", worry: "rgba(239,68,68,.25)", panic: "rgba(239,68,68,.35)", cheer: "rgba(16,185,129,.30)" };
+const WHO_BADGE = {
+  user: { face: "🧑‍💻", cls: "user", tag: "YOU · 你的指令" },
+  agent: { face: "🤖", cls: "agent", tag: "AGENT · 自动执行" },
+  system: { face: "📣", cls: "system", tag: "SYSTEM · 旁白" },
+};
 
 let DB = null;
 let state = null;
 let currentEvent = null;
 let pendingGoto = "";
 let probeUsed = new Set();
-let skipType = false; // 点击聊天区跳过打字/逐条动画
+let skipType = false; // 点击聊天区跳过当前打字/逐条动画
 let lastStats = null;
 let rngState = 0;
 
-// 跨局收集持久化（localStorage）——H5 版的 user://collection.json 等价物
+const rng = () => {
+  rngState |= 0; rngState = (rngState + 0x6D2B79F5) | 0;
+  let t = Math.imul(rngState ^ (rngState >>> 15), 1 | rngState);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
+
+// ---- 收集持久化（localStorage，H5 版 user://collection.json 等价物）----
 const COLL_KEY = "agent-life-cards";
 function collLoad() {
   try { return JSON.parse(localStorage.getItem(COLL_KEY) || "{}"); } catch { return {}; }
 }
-function collSave(obj) {
-  try { localStorage.setItem(COLL_KEY, JSON.stringify(obj)); } catch { /* 隐私模式等场景忽略 */ }
-}
+function collSave(obj) { try { localStorage.setItem(COLL_KEY, JSON.stringify(obj)); } catch { /* 忽略 */ } }
 function collUnlock(cardId) {
   const c = collLoad();
   if (!c[cardId]) { c[cardId] = true; collSave(c); }
@@ -44,13 +56,7 @@ function collUnlockMany(ids) {
   if (changed) collSave(c);
 }
 
-function rng() {
-  rngState |= 0; rngState = (rngState + 0x6D2B79F5) | 0;
-  let t = Math.imul(rngState ^ (rngState >>> 15), 1 | rngState);
-  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-}
-
+// ---- 数据 ----
 async function loadDB() {
   const j = async (p) => (await fetch(p)).json();
   const dir = async (base) => {
@@ -69,6 +75,7 @@ async function loadDB() {
   return { scenarios, events, cards, endings: endings.endings, mascot };
 }
 
+// ---- 规则（spec v1.2 子集）----
 function checkRequires(req, st) {
   req = req || {};
   const t = st.turn + 1;
@@ -148,7 +155,6 @@ function resolveEnding(st) {
 }
 
 // ---- 呈现 ----
-
 function scrollBottom() {
   window.scrollTo({ top: document.body.scrollHeight, behavior: skipType ? "auto" : "smooth" });
 }
@@ -158,6 +164,7 @@ function buildMsg(who, text) {
   const row = el("div", "msg " + meta.cls);
   row.append(el("div", "badge " + meta.cls, meta.face));
   const bubble = el("div", "bubble");
+  bubble.append(el("div", "who-tag", meta.tag));
   const span = el("span", "msg-text");
   const cursor = el("span", "cursor", "▌");
   bubble.append(span, cursor);
@@ -166,20 +173,21 @@ function buildMsg(who, text) {
   return { row, span, cursor, text };
 }
 
-async function typeText(node, text) {
+async function typeText(span, text, cursor) {
   for (let i = 0; i < text.length; i++) {
-    if (skipType) { node.textContent = text; break; }
-    node.textContent += text[i];
-    if (i % 2 === 0) await sleep(20);
+    if (skipType) { span.textContent = text; break; }
+    span.textContent += text[i];
     scrollBottom();
+    await sleep(18);
   }
+  cursor.remove();
+  scrollBottom();
 }
 
-// 逐条出现：每条消息淡入 + 打字机；skipType 时瞬时全出
+// 逐条出现：淡入 + 打字机；skipType 时瞬时全出
 async function playMessages(msgs) {
   const chat = $("#chat");
-  for (let i = 0; i < msgs.length; i++) {
-    const { who, text } = msgs[i];
+  for (const { who, text } of msgs) {
     if (skipType) {
       chat.append(buildMsgStatic(who, text));
       continue;
@@ -187,10 +195,9 @@ async function playMessages(msgs) {
     const node = buildMsg(who, text);
     chat.append(node.row);
     scrollBottom();
-    await sleep(240);
-    await typeText(node.span, text);
-    node.cursor.remove();
-    await sleep(160);
+    await sleep(300);
+    await typeText(node.span, text, node.cursor);
+    await sleep(200);
   }
   scrollBottom();
 }
@@ -199,41 +206,31 @@ function buildMsgStatic(who, text) {
   const meta = WHO_BADGE[who] || WHO_BADGE.system;
   const row = el("div", "msg " + meta.cls);
   row.append(el("div", "badge " + meta.cls, meta.face));
-  row.append(el("div", "bubble", text));
-  return row;
+  const bubble = el("div", "bubble");
+  bubble.append(el("div", "who-tag", meta.tag));
+  bubble.append(el("span", "", text));
+  return row.append(bubble), row;
 }
 
-function renderTop(st, changed) {
+function renderTop(st, changed, prev) {
   const cur = st.finished ? st.maxTurns : st.turn + 1;
   $("#turn").textContent = `第 ${cur}/${st.maxTurns} 回合`;
   const bar = $("#stats");
   bar.innerHTML = "";
   for (const k of Object.keys(STAT_NAMES)) {
     const v = st.stats[k];
-    const pill = el("div", "pill" + (v < 30 ? " bad" : v >= 60 ? " good" : "") + (changed && changed.has(k) ? " flash" : ""));
-    pill.append(`${STAT_NAMES[k]} `);
+    const pill = el("div", "pill" + (v < 30 ? " bad" : v >= 60 ? " good" : "") + (changed && changed.has(k) ? " flash" : "") + (changed && changed.has(k) && prev && v < prev[k] ? " shake" : ""));
+    pill.dataset.key = k;
+    const fill = el("span", "fill");
+    fill.style.width = v + "%";
+    pill.append(fill);
+    pill.append(el("span", "pname", STAT_NAMES[k]));
     pill.append(el("b", "", String(v)));
+    // 悬停选项时的预判指示点（Reigns 机制）
+    const dot = el("span", "predot");
+    pill.append(dot);
     bar.append(pill);
   }
-}
-
-function renderEvent() {
-  const st = state;
-  skipType = false;
-  $("#chat").innerHTML = "";
-  const ev = currentEvent;
-  const head = el("div", "title-row");
-  head.append(el("span", "bar"));
-  head.append(el("h1", "", `${ev.icon || ""} ${ev.title || ""}`));
-  $("#chat").append(head);
-  const msgs = [];
-  if (st.turn === 0 && st.scenario.intro) msgs.push({ who: "system", text: st.scenario.intro });
-  for (const m of ev.chat || []) msgs.push({ who: m.who, text: m.text });
-  playMessages(msgs).then(() => {
-    if (!state || state !== st) return;
-    renderChoices();
-    renderTop(st);
-  });
 }
 
 function renderChoices() {
@@ -252,7 +249,17 @@ function renderChoices() {
     btn.append(num);
     if (isProbe) btn.append(el("span", "tagchip", "试探"));
     btn.append(el("span", "ctext", c.text));
-    btn.onclick = () => onChoice(c.id);
+    // 悬停预判：点亮该选项影响的属性胶囊指示点
+    const affected = Object.keys(c.effects || {}).filter((k) => STAT_NAMES[k]);
+    btn.addEventListener("mouseenter", () => {
+      document.querySelectorAll("#stats .pill").forEach((p) => {
+        p.classList.toggle("pred", affected.includes(p.dataset.key));
+      });
+    });
+    btn.addEventListener("mouseleave", () => {
+      document.querySelectorAll("#stats .pill").forEach((p) => p.classList.remove("pred"));
+    });
+    btn.onclick = () => onChoice(c.id, btn);
     box.append(btn);
   }
 }
@@ -270,13 +277,31 @@ function mascotReact(slot) {
   const pool = DB.mascot.slots[slot] || [];
   if (!pool.length) return;
   const e = pool[Math.floor(rng() * pool.length)];
-  $("#m-line").textContent = e.text;
-  const face = $("#m-face");
-  face.textContent = MOOD_FACES[e.mood] || "🙂";
-  face.classList.remove("pop");
-  void face.offsetWidth;
-  face.classList.add("pop");
-  setTimeout(() => face.classList.remove("pop"), 300);
+  typeMascot(e.text, MOOD_FACES[e.mood] || "🙂", e.mood);
+}
+
+// 小D 吐槽打字机：破折号处刻意停顿 400ms（Gemini 建议：节奏演出）
+async function typeMascot(text, face, mood) {
+  const line = $("#m-line");
+  const faceEl = $("#m-face");
+  line.textContent = "";
+  faceEl.textContent = face;
+  faceEl.classList.remove("pop");
+  void faceEl.offsetWidth;
+  faceEl.classList.add("jelly");
+  $("#mascot").style.setProperty("--ring", MOOD_RING[mood] || MOOD_RING.normal);
+  for (let i = 0; i < text.length; i++) {
+    const two = text.slice(i, i + 2);
+    if (two === "——") {
+      line.textContent += "——";
+      await sleep(400);
+      i += 1;
+      continue;
+    }
+    line.textContent += text[i];
+    if (!skipType) await sleep(30);
+  }
+  setTimeout(() => faceEl.classList.remove("jelly"), 460);
 }
 function mascotReactStats(st) {
   let danger = 0, worst = 100, allGood = true;
@@ -291,11 +316,16 @@ function mascotReactStats(st) {
   else if (allGood) mascotReact("good");
 }
 
-function onChoice(choiceId) {
-  skipType = true; // 选择后结果即时显示（动画已在消息阶段给足节奏）
+function onChoice(choiceId, btnEl) {
+  skipType = true; // 选择后结果即时显示
   const st = state;
   const choice = (currentEvent.choices || []).find((c) => c.id === choiceId);
   if (!choice) return;
+  // 结算锁定演出：未选项淡出，选中项高亮保持 450ms
+  document.querySelectorAll("#choices .choice").forEach((b) => {
+    if (b !== btnEl) { b.classList.add("fade-out"); }
+    else { b.classList.add("chosen"); }
+  });
   applyEffects(choice.effects, st);
   if (choice.card) { st.unlocked[choice.card] = true; collUnlock(choice.card); }
   const t0 = st.turn + 1;
@@ -307,22 +337,26 @@ function onChoice(choiceId) {
   }
   pendingGoto = choice.goto || "";
   const changed = new Set(Object.keys(choice.effects || {}).filter((k) => STAT_NAMES[k]));
-  const res = choice.result;
-  if (res) addMsg(res.who, res.text);
+  if (choice.result) addMsg(choice.result.who, choice.result.text);
   showDeltas(choice.effects);
-  renderTop(st, changed);
+  renderTop(st, changed, lastStats);
+  lastStats = { ...st.stats };
   mascotReactStats(st);
   const broke = st.stats.money <= 0, meltdown = st.stats.sanity <= 0;
   st.turn += 1;
   if (broke || meltdown) {
     st.finished = true;
     st.endingId = broke ? "_broke" : "_meltdown";
-    setTimeout(showEnding, 500);
+    setTimeout(() => { updateAlarm(st); showEnding(); }, 550);
     return;
   }
-  if (choice.card) showCard(choice.card);
-  else if (st.turn >= st.maxTurns) { st.finished = true; setTimeout(showEnding, 500); }
-  else showContinue();
+  const showCardNext = !!choice.card;
+  const reachEnd = st.turn >= st.maxTurns;
+  setTimeout(() => {
+    if (showCardNext) showCard(choice.card);
+    else if (reachEnd) { st.finished = true; showEnding(); }
+    else showContinue();
+  }, 550);
 }
 
 function addMsg(who, text) {
@@ -354,12 +388,16 @@ function nextTurn() {
 function showCard(cardId) {
   const card = DB.cards[cardId];
   const ov = el("div", "overlay");
-  const p = el("div", "panel");
-  p.append(el("div", "tag", "坑点卡"));
+  const p = el("div", "panel card-panel");
+  p.append(el("div", "warnbar"));
+  p.append(el("div", "tag", "坑点卡 · 已收录图鉴"));
   p.append(el("h2", "", `${card.icon || ""} ${card.name}（威胁等级：${card.severity}）`));
   p.append(el("p", "", "是什么：" + card.essence));
   p.append(el("p", "", "为什么会发生：" + card.why));
-  p.append(el("p", "", "怎么防：" + card.defenses.map((d) => "· " + d).join("<br>")));
+  const defenseBox = el("div", "defense-box");
+  defenseBox.append(el("div", "defense-title", "怎么防"));
+  for (const d of card.defenses || []) defenseBox.append(el("div", "defense-item", "· " + d));
+  p.append(defenseBox);
   const row = el("div", "btn-row");
   const btn = el("button", "primary", "收下，继续 →");
   btn.onclick = () => { ov.remove(); state.finished ? showEnding() : showContinue(); };
@@ -372,6 +410,7 @@ function showCard(cardId) {
 function showEnding() {
   const st = state;
   skipType = true;
+  updateAlarm(st);
   mascotReact(st.endingId === "_the_end" || st.endingId === "" ? "ending_mid" : "ending_good");
   const ending = resolveEnding(st);
   const ov = el("div", "overlay");
@@ -402,45 +441,69 @@ function showEnding() {
   document.body.append(ov);
 }
 
+// ---- 危机警报呼吸层（数值 <25 时全屏红晕）----
+function updateAlarm(st) {
+  const alarm = $("#alarm");
+  if (!alarm) return;
+  const danger = Object.keys(STAT_NAMES).some((k) => st.stats[k] < 25 && k !== "progress");
+  alarm.classList.toggle("on", danger && !st.finished);
+}
+
+// ---- 主菜单 ----
 function showMenu() {
   const app = $("#app");
   app.innerHTML = "";
   $("#mascot").classList.add("hidden");
   const menu = el("div", "menu");
-  for (const d of ["💻", "🤖", "💸", "⚠️", "🧠"]) {
-    const deco = el("div", "deco", d);
+  const DECO = [
+    { e: "💻", x: "12%", y: "12%", s: 46, far: false }, { e: "🤖", x: "72%", y: "16%", s: 38, far: true },
+    { e: "💸", x: "16%", y: "68%", s: 42, far: true }, { e: "⚠️", x: "78%", y: "58%", s: 44, far: false },
+    { e: "🧠", x: "30%", y: "82%", s: 40, far: true }, { e: "🐛", x: "64%", y: "78%", s: 36, far: false },
+    { e: "📉", x: "8%", y: "44%", s: 34, far: true }, { e: "☕", x: "86%", y: "30%", s: 38, far: false },
+  ];
+  for (const d of DECO) {
+    const deco = el("div", "deco", d.e);
+    deco.style.left = d.x;
+    deco.style.top = d.y;
+    deco.style.fontSize = d.s + "px";
+    if (d.far) { deco.classList.add("far"); }
     menu.append(deco);
   }
   const title = el("h1", "", `<span class="en">Agent</span> <span class="cn">人生</span>`);
-  const subtitle = el("div", "subtitle", "AI Agent 被坑体验模拟器");
+  const subtitle = el("div", "subtitle", "// AI Agent 被坑体验模拟器 //");
   menu.append(title, subtitle, el("div", "divider"));
   const box = el("div", "choices");
-  for (const sid of Object.keys(DB.scenarios)) {
-    const sc = DB.scenarios[sid];
-    const btn = el("button", "choice", "开始：" + sc.title);
+  const primaryDefs = [
+    ["🏚️", "legacy_code", "开始：接手祖传代码"],
+    ["🚀", "vibe_coding", "开始：Vibe Coding 创业记"],
+  ];
+  for (const [icon, sid, label] of primaryDefs) {
+    const btn = el("button", "choice primary-choice");
+    btn.append(el("span", "menu-badge", icon));
+    btn.append(el("span", "", label));
     btn.onclick = () => startRun(sid);
     box.append(btn);
   }
-  const gallery = el("button", "choice subtle", "坑点图鉴 · 事故档案");
+  const gallery = el("button", "choice subtle", "📇 坑点图鉴 · 事故档案");
   gallery.onclick = () => {
     const ov = el("div", "overlay");
     const p = el("div", "panel");
     p.append(el("div", "tag", "COLLECTION // 收集"));
     p.append(el("h2", "", "坑点图鉴 · 事故档案"));
-    let unlocked = 0;
     const coll = collLoad();
+    let unlocked = 0;
     for (const cid of Object.keys(DB.cards)) {
       const card = DB.cards[cid];
-      const has = (state && state.unlocked[cid]) || coll[cid];
+      const has = coll[cid];
       if (has) unlocked++;
       const d = el("p", "", has
         ? `<b>${card.icon || ""} ${card.name}</b>（${card.severity}）：${card.essence}`
-        : "？？？ —— 在实战中踩到这个坑后解锁");
+        : `<span class="mystery">？？？ —— 在实战中踩到这个坑后解锁</span>`);
       d.style.borderBottom = "1px solid var(--divider)";
       d.style.padding = "8px 0";
       p.append(d);
     }
-    p.append(el("p", "", `已解锁 ${unlocked}/${Object.keys(DB.cards).length}`));
+    p.append(el("p", "", `跨局累计解锁 ${unlocked}/${Object.keys(DB.cards).length}`));
     const row = el("div", "btn-row");
     const close = el("button", "plain", "关闭");
     close.onclick = () => ov.remove();
@@ -454,7 +517,20 @@ function showMenu() {
   quit.onclick = () => { document.body.innerHTML = "<div class='loading'>游戏已退出。刷新页面重新开始。</div>"; };
   menu.append(box, quit);
   const version = el("div", "version", "v0.6-prototype · H5");
-  app.append(menu, version);
+  menu.append(version);
+  app.append(menu);
+}
+
+// 漂浮 emoji 鼠标视差（近景反向 0.02，远景 0.008）
+function enableParallax() {
+  document.addEventListener("mousemove", (e) => {
+    const cx = e.clientX - innerWidth / 2, cy = e.clientY - innerHeight / 2;
+    document.querySelectorAll(".menu .deco").forEach((d) => {
+      const depth = d.classList.contains("far") ? 8 : 20;
+      d.style.marginLeft = (-cx / depth) + "px";
+      d.style.marginTop = (-cy / depth) + "px";
+    });
+  });
 }
 
 function startRun(scenarioId) {
@@ -486,6 +562,7 @@ function startRun(scenarioId) {
 (async function main() {
   try {
     DB = await loadDB();
+    enableParallax();
     showMenu();
   } catch (err) {
     $("#app").innerHTML = `<div class="loading">内容加载失败：${err}<br>请用 <code>python3 tools/serve_h5.py</code> 启动本地服务后访问。</div>`;
