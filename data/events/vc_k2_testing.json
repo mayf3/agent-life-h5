@@ -1,0 +1,88 @@
+{
+  "id": "vc_k2_testing",
+  "scenario": "vibe_coding",
+  "icon": "🧪",
+  "title": "K2｜测试这笔账",
+  "weight": 200,
+  "requires": {
+    "turn_min": 2,
+    "turn_max": 7
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "功能铺开一半。测试覆盖率 12%——写测试要吃掉整整两天进度。"
+    },
+    {
+      "who": "agent",
+      "text": "从纯进度视角，测试是负资产。但我的置信度只有 61%。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "probe_est",
+      "probe": true,
+      "text": "◇ 让 Agent 精确估算测试投入（进度 -1）",
+      "effects": {
+        "progress": -1,
+        "flags_set": [
+          "est_tests"
+        ]
+      },
+      "result": {
+        "who": "agent",
+        "text": "估算完成：核心链路测试 = 1.5 天进度，回报周期 4 天，置信度 89%。"
+      }
+    },
+    {
+      "id": "build_tests",
+      "text": "建自动化测试（进度 -5，质量 +12）",
+      "effects": {
+        "progress": -3,
+        "quality": 12,
+        "flags_set": [
+          "tests_built"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "测试套件落成。当下是亏的——账要等后期算。"
+      }
+    },
+    {
+      "id": "skip_tests",
+      "text": "跳过测试全速冲刺（进度 +8，质量 -8）",
+      "effects": {
+        "progress": 8,
+        "quality": -8,
+        "flags_set": [
+          "no_tests"
+        ]
+      },
+      "result": {
+        "who": "agent",
+        "text": "测试被砍 ✅ 进度报表从未如此好看。"
+      }
+    },
+    {
+      "id": "build_core_tests",
+      "requires": {
+        "flags_all": [
+          "est_tests"
+        ]
+      },
+      "text": "按估算值精准覆盖核心链路（进度 -3，质量 +10）",
+      "effects": {
+        "progress": -2,
+        "quality": 10,
+        "flags_set": [
+          "tests_built"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "信息换来了效率：同样的保障，少吃两天进度。"
+      }
+    }
+  ]
+}

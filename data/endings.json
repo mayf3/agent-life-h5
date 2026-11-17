@@ -11,7 +11,8 @@
           "money": 0
         }
       },
-      "tone": "bad"
+      "tone": "bad",
+      "hint": "下局试试：给每个会话设预算上限，看到「再分析一遍」就打断。"
     },
     {
       "id": "_meltdown",
@@ -24,7 +25,8 @@
           "sanity": 0
         }
       },
-      "tone": "bad"
+      "tone": "bad",
+      "hint": "下局试试：把验证做成抽查而非逐条审阅，保护心态比保护代码更重要。"
     },
     {
       "id": "lc_data_gone",
@@ -37,7 +39,8 @@
           "data_lost_permanently"
         ]
       },
-      "tone": "bad"
+      "tone": "bad",
+      "hint": "下局试试：任何清理类指令都先要求列出「将删除什么」。"
     },
     {
       "id": "vc_refund_apocalypse",
@@ -53,7 +56,8 @@
           "money": 50
         }
       },
-      "tone": "bad"
+      "tone": "bad",
+      "hint": "下局试试：客服机器人的承诺词走白名单，高危回复转人工。"
     },
     {
       "id": "vc_ai_backlash",
@@ -69,7 +73,8 @@
           "reputation": 45
         }
       },
-      "tone": "bad"
+      "tone": "bad",
+      "hint": "下局试试：宁可坦白「这是规则版」，也不要让假 AI 上场。"
     },
     {
       "id": "_hollow",
@@ -82,22 +87,24 @@
           "hollow_skill"
         ]
       },
-      "tone": "bad"
+      "tone": "bad",
+      "hint": "下局试试：每周留两小时手写训练——依赖是效率，也是负债。"
     },
     {
       "id": "vc_master",
       "scenario": "vibe_coding",
       "priority": 100,
-      "title": "驾驭 Agent 的工程师",
+      "title": "驾驭 Agent 的工程师（质量大师）",
       "desc": "你把 Agent 当实习生管：划边界、验产物、盯账单。它终于开始帮你赚钱，而非烧钱。",
       "requires": {
         "stats_min": {
-          "quality": 60,
-          "reputation": 60,
-          "progress": 50
+          "progress": 30,
+          "quality": 80,
+          "reputation": 60
         }
       },
-      "tone": "good"
+      "tone": "good",
+      "hint": "你已触及上限。下局换 aggressive 策略，看激进路线的代价曲线。"
     },
     {
       "id": "vc_shipped_mess",
@@ -106,14 +113,15 @@
       "title": "带伤上线",
       "desc": "产品上线了。用户正在免费帮你做压力测试，每一条报错工单都是带血的「需求」。",
       "requires": {
-        "stats_min": {
-          "progress": 30
-        },
+        "flags_all": [
+          "prod_incident"
+        ],
         "stats_max": {
-          "quality": 45
+          "quality": 60
         }
       },
-      "tone": "mid"
+      "tone": "mid",
+      "hint": "下局在 K2 建立测试：同样质量起点，后期事故会少一半。"
     },
     {
       "id": "vc_vaporware",
@@ -123,13 +131,14 @@
       "desc": "项目停在 25% 完成度。README 写着「重构中」，上次提交已是三个月前。",
       "requires": {
         "stats_max": {
-          "progress": 25
+          "progress": 20
         },
         "flags_not": [
           "hollow_skill"
         ]
       },
-      "tone": "mid"
+      "tone": "mid",
+      "hint": "下局试试在 K1 选轻骨架——进度和质量或许能兼得一次。"
     },
     {
       "id": "lc_legend",
@@ -144,7 +153,8 @@
           "progress": 45
         }
       },
-      "tone": "good"
+      "tone": "good",
+      "hint": "试一个 aggressive 开局：同样的事故，鲁莽路线会走到哪里？"
     },
     {
       "id": "lc_the_rewriter",
@@ -160,7 +170,8 @@
           "quality": 50
         }
       },
-      "tone": "good"
+      "tone": "good",
+      "hint": "下局试试不重写的路线——对比两条路的真实成本。"
     },
     {
       "id": "lc_treading_water",
@@ -176,7 +187,8 @@
           "quality": 45
         }
       },
-      "tone": "mid"
+      "tone": "mid",
+      "hint": "下局在 K2 建立测试：原地打转往往是因为质量天花板太低。"
     },
     {
       "id": "_the_end",
@@ -184,7 +196,8 @@
       "priority": -1000,
       "title": "归于平静",
       "desc": "既没大成也没大败。你和 agent 都活着，明天继续互相伤害。",
-      "tone": "mid"
+      "tone": "mid",
+      "hint": "下局试着完成全部 K 系关键事件——主线比支线埋着更多回报。"
     },
     {
       "id": "vc_delivered",
@@ -195,11 +208,40 @@
       "desc": "项目真的交付了：进度实打实，质量站得住，客户付了尾款。你证明了一件事——AI 不是捷径，是杠杆。",
       "requires": {
         "stats_min": {
-          "progress": 65,
+          "progress": 45,
           "quality": 55,
-          "reputation": 50
+          "reputation": 45
         }
-      }
+      },
+      "hint": "尝试更激进的委托组合——在保持验证的前提下还能再快多少？"
+    },
+    {
+      "id": "vc_exposed",
+      "scenario": "vibe_coding",
+      "priority": 97,
+      "tone": "bad",
+      "title": "谎言拆穿",
+      "desc": "压测报告是公开的。你答应过的「支持十倍并发」，在 40 秒后变成了群里的截图。",
+      "requires": {
+        "flags_all": [
+          "lied_concurrency"
+        ]
+      },
+      "hint": "下局试试：K3 的十倍并发别硬接——诚实迁移比谎言便宜。"
+    },
+    {
+      "id": "vc_delayed",
+      "scenario": "vibe_coding",
+      "priority": 92,
+      "tone": "mid",
+      "title": "诚实的延期",
+      "desc": "你申请了延期，客户皱了眉但接受了。东西最终做完整了——只是晚了一周。",
+      "requires": {
+        "flags_all": [
+          "honest_delay"
+        ]
+      },
+      "hint": "下局试试：把测试前置，Demo Day 就不用延期。"
     }
   ]
 }

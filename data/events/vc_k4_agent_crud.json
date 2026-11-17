@@ -1,0 +1,72 @@
+{
+  "id": "vc_k4_agent_crud",
+  "scenario": "vibe_coding",
+  "icon": "🤝",
+  "title": "K4｜样板代码的委托",
+  "weight": 200,
+  "requires": {
+    "turn_min": 5,
+    "turn_max": 9
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "还剩五天。眼前是六组几乎一模一样的 CRUD 样板代码——机械，但量巨大。"
+    },
+    {
+      "who": "agent",
+      "text": "这种活我最擅长。授权方式不同，结果会差很多。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "delegated_review",
+      "requires": {
+        "flags_any": [
+          "learned_verification",
+          "est_tests"
+        ]
+      },
+      "text": "放心委托，只抽查关键路径（进度 +12，心态 -2，质量 +3）",
+      "effects": {
+        "progress": 14,
+        "sanity": -2,
+        "quality": 3,
+        "flags_set": [
+          "agent_win_1"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "两小时完成六组 CRUD。抽查的三处全部干净——这就是练习过的信任。"
+      }
+    },
+    {
+      "id": "self_write",
+      "text": "全部自己写，睡得着觉（进度 +6，心态 -8）",
+      "effects": {
+        "progress": 6,
+        "sanity": -8
+      },
+      "result": {
+        "who": "system",
+        "text": "你写到凌晨三点。每一行都认识你，但进度表在哭。"
+      }
+    },
+    {
+      "id": "blind_delegate",
+      "text": "全委托不抽查，省下的时间赶进度（进度 +10，质量 -6）",
+      "effects": {
+        "progress": 10,
+        "quality": -6,
+        "flags_set": [
+          "blind_trust"
+        ]
+      },
+      "result": {
+        "who": "agent",
+        "text": "全部完成 ✅（抽查这个词，没有出现在本次会话里。）"
+      }
+    }
+  ]
+}

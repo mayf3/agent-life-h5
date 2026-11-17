@@ -145,8 +145,10 @@ function settleChoice(st, currentEvent, choiceId, events, opts) {
   for (const k of STAT_KEYS) if (choice.effects && choice.effects[k] !== undefined) outcome.deltas[k] = choice.effects[k];
 
   if (choice.probe) {
-    // 试探（P11）：耗资源换信息，不消耗回合、不触发终局；本事件内不可重复
+    // 试探（P11）：耗资源换信息，不消耗回合、不触发终局；本事件内不可重复。
+    // v0.7 关键修复：probe 不留提交锁——否则同事件的正式选项会被锁死（玩家实测“试探后直接结束事件”的根因）。
     st.probeUsed.add(probeKey);
+    st.committed = false;
     const imm = immediateEndId(st);
     if (imm) { st.finished = true; st.endingId = imm; outcome.ended = true; }
     return { ok: true, outcome };

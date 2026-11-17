@@ -12,9 +12,7 @@ const DATA = new URL("./data/", import.meta.url).pathname;
 const j = (p) => JSON.parse(readFileSync(DATA + p, "utf-8"));
 const endings = j("endings.json").endings;
 const events = {};
-for (const f of ["vc_001_overengineering", "vc_002_prod_incident", "vc_fallback_daily", "vc_005_token_burn"]) {
-  events[f] = j("events/" + f + ".json");
-}
+for (const id of j("events/index.json")) events[id] = j("events/" + id + ".json");
 const scenario = j("scenarios/vibe_coding.json");
 
 function freshState() {
@@ -179,4 +177,97 @@ test("数据完整性：每个结局有唯一 priority 与合法 tone；即时�
   for (const fixed of ["_broke", "_meltdown", "_the_end"]) {
     assert.ok(endings.some((e) => e.id === fixed), `缺少引擎约定结局 ${fixed}`);
   }
+});
+
+// ── v0.8 垂直切片：因果链与路径可达性 ──
+const allEvents = {};
+for (const f of [
+  "vc_k1_architecture", "vc_k2_testing", "vc_k3_scope_change", "vc_k4_agent_crud",
+  "vc_k5_incident", "vc_k5_prod_blast", "vc_k5_exposed", "vc_k6_demo_day",
+  "vc_001_overengineering", "vc_fallback_daily", "vc_005_token_burn",
+]) allEvents[f] = j("events/" + f + ".json");
+const allEventsRef = allEvents;
+const kEvents = (id) => allEvents[id];
+
+test("v0.8 因果①：arch_heavy 玩家在 K3 看到『改配置即可』正反馈选项", () => {
+  const st = freshState();
+  st.flags["arch_heavy"] = true;
+  st.turn = 5;
+  const k3 = kEvents("vc_k3_scope_change");
+  const visible = (k3.choices || []).filter((c) => R.checkRequires(c.requires || {}, st));
+  assert.ok(visible.some((c) => c.id === "heavy_ok"), "heavy 玩家必须看到正反馈选项");
+  assert.ok(!visible.some((c) => c.id === "light_migrate"), "light 专属选项对 heavy 玩家不可见");
+});
+
+test("v0.8 因果②：tests_built 玩家在 K5 看到『测试拦下』减伤选项", () => {
+  const st = freshState();
+  st.flags["tests_built"] = true;
+  st.turn = 8;
+  const k5 = kEvents("vc_k5_incident");
+  const visible = (k5.choices || []).filter((c) => R.checkRequires(c.requires || {}, st));
+  assert.ok(visible.some((c) => c.id === "caught_by_tests"), "tests_built 玩家看到正反馈");
+  const st2 = freshState();
+  st2.flags["no_tests"] = true;
+  st2.turn = 8;
+  const visible2 = (k5.choices || []).filter((c) => R.checkRequires(c.requires || {}, st2));
+  assert.ok(visible2.some((c) => c.id === "prod_blast"), "no_tests 玩家看到事故分支");
+});
+
+test("v0.8 因果③：lied_concurrency 玩家在 K5c 面对拆穿事件", () => {
+  const st = freshState();
+  st.flags["lied_concurrency"] = true;
+  st.turn = 9;
+  const k5c = kEvents("vc_k5_exposed");
+  const visible = (k5c.choices || []).filter((c) => R.checkRequires(c.requires || {}, st));
+  assert.equal(visible.length, 2, "拆穿事件两个选项均可见");
+});
+
+test("v0.8 学习标志：learned_verification 解锁 K4 高收益委托", () => {
+  const st = freshState();
+  st.flags["learned_verification"] = true;
+  st.turn = 6;
+  const k4 = kEvents("vc_k4_agent_crud");
+  const visible = (k4.choices || []).filter((c) => R.checkRequires(c.requires || {}, st));
+  const win = visible.find((c) => c.id === "delegated_review");
+  assert.ok(win, "学习标志必须解锁高收益委托");
+  assert.equal(win.effects.progress, 14, "高收益委托进度收益最高");
+  const st2 = freshState();
+  st2.turn = 6;
+  const visible2 = (k4.choices || []).filter((c) => R.checkRequires(c.requires || {}, st2));
+  assert.ok(!visible2.some((c) => c.id === "delegated_review"), "未学习玩家看不到该选项");
+});
+
+test("v0.8 结局 hint：全部结局带下局策略提示", () => {
+  for (const e of endings) {
+    assert.ok(e.hint && e.hint.length > 5, `${e.id} 缺 hint`);
+  }
+});
+
+test("v0.8 选项代价差异化：K1 三条路均有合理收益（无无条件正确答案）", () => {
+  const k1 = kEvents("vc_k1_architecture");
+  const gains = k1.choices.filter((c) => !c.probe).map((c) => ({
+    id: c.id, progress: c.effects.progress || 0,
+  }));
+  const heavy = gains.find((g) => g.id === "heavy");
+  const light = gains.find((g) => g.id === "light");
+  const bench = gains.find((g) => g.id === "benchmark");
+  assert.ok(heavy.progress > light.progress && heavy.progress > bench.progress,
+    "heavy 进度收益最高（承担 K3 风险）");
+  assert.ok(bench.progress > 0, "谨慎路线也有正收益（不无理由惩罚谨慎）");
+  assert.ok(light.progress >= 10, "轻量路线进度可观");
+});
+
+test("v0.7 关键修复：试探后提交锁解除，正式选项可用", () => {
+  const st = freshState();
+  st.turn = 3;
+  const probeChoice = Object.values(events).flatMap((e) => e.choices || []).find((c) => c.probe);
+  const probeEvent = Object.values(events).find((e) => (e.choices || []).includes(probeChoice));
+  const first = R.settleChoice(st, probeEvent, probeChoice.id, events);
+  assert.equal(first.ok, true);
+  assert.equal(first.outcome.probe, true);
+  assert.equal(st.committed, false, "试探后提交锁必须解除");
+  const formalChoice = probeEvent.choices.find((c) => !c.probe);
+  const formal = R.settleChoice(st, probeEvent, formalChoice.id, events);
+  assert.equal(formal.ok, true, "试探后正式选项必须可结算");
+  assert.equal(st.committed, true, "正式选项结算后重新上锁");
 });

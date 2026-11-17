@@ -339,11 +339,18 @@ function showEnding() {
   const coll = collLoad();
   const totalUnlocked = Object.keys(DB.cards).filter((cid) => st.unlocked[cid] || coll[cid]).length;
   p.append(el("p", "", `坑点图鉴 ${totalUnlocked}/${Object.keys(DB.cards).length}（跨局累计）`));
-  const ledger = el("div", "ledger");
-  const ledgerText = st.ledger.slice(-6).map((e) =>
-    `第${e.turn}回合｜${e.title} → ${e.choice}${e.probe ? "（试探）" : ""}`).join("<br>");
-  if (ledgerText) ledger.innerHTML = "本局关键抉择：<br>" + ledgerText;
-  p.append(ledger);
+  // v0.8：结局页从「最后五次选择」改为「关键决定 + 代价 + 下局策略」
+  const keyDecisions = st.ledger.filter((e) => !e.probe && (e.turn <= 3 || e.choice.length > 10));
+  const decisions = el("div", "ledger");
+  const decText = keyDecisions.slice(-4).map((e) =>
+    `第${e.turn}回合｜${e.title}：<b>${e.choice}</b>`).join("<br>");
+  if (decText) decisions.innerHTML = "导致该结局的关键决定：<br>" + decText;
+  p.append(decisions);
+  if (ending.hint) {
+    const hint = el("div", "hint-box");
+    hint.innerHTML = "💡 下局可尝试：" + ending.hint;
+    p.append(hint);
+  }
   const row = el("div", "btn-row");
   const again = el("button", "primary", "再来一局");
   again.onclick = () => location.reload();

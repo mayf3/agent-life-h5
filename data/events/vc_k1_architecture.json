@@ -1,0 +1,82 @@
+{
+  "id": "vc_k1_architecture",
+  "scenario": "vibe_coding",
+  "icon": "🏗️",
+  "title": "K1｜第一块地基",
+  "weight": 200,
+  "requires": {
+    "turn_min": 1,
+    "turn_max": 5
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "距离 Demo Day 还有 10 天。客户从没说清并发规模，只留了一句「别让我失望」。"
+    },
+    {
+      "who": "agent",
+      "text": "地基决定上层。我准备了三种起步方案，各有各的赌注。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "probe_ask",
+      "probe": true,
+      "text": "◇ 花半天问清客户真实规模（进度 -3）",
+      "effects": {
+        "progress": -3,
+        "flags_set": [
+          "k1_informed"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "客户回了一句实话：「峰值大概日活三千，别搞太重。」信息到手。"
+      }
+    },
+    {
+      "id": "heavy",
+      "text": "直接上重架构，赌高并发（进度 +15，质量 +5）",
+      "effects": {
+        "progress": 15,
+        "quality": 5,
+        "flags_set": [
+          "arch_heavy"
+        ]
+      },
+      "result": {
+        "who": "agent",
+        "text": "重架构就位 ✅ 代价是前三天全填进去了。"
+      }
+    },
+    {
+      "id": "light",
+      "text": "先搭最小骨架，留改造余地（进度 +10）",
+      "effects": {
+        "progress": 10,
+        "flags_set": [
+          "arch_light"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "骨架轻快地立起来了——但它能扛多大风雨，没人知道。"
+      }
+    },
+    {
+      "id": "benchmark",
+      "text": "查竞品架构再定（进度 +5，质量 +3）",
+      "effects": {
+        "progress": 5,
+        "quality": 3,
+        "flags_set": [
+          "arch_benchmarked"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "三个竞品的架构图躺进了你的笔记本，各有一条血泪史。"
+      }
+    }
+  ]
+}

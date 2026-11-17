@@ -1,10 +1,24 @@
 {
   "id": "vibe_coding",
   "title": "Vibe Coding 创业记",
-  "intro": "你用攒下的存款启动了一个小项目，并决定全程用 AI Agent 开发——听起来又快又省钱。",
-  "start_stats": {"money": 70, "progress": 12, "quality": 55, "sanity": 80, "reputation": 50},
+  "intro": "你和两个首批客户签了意向：12 天后的 Demo Day 决定续约。胜利条件很直白——交付日当天，进度 ≥45、质量 ≥55、信誉 ≥45，三者缺一就是另一种故事。你的 Agent 已就位。",
+  "start_stats": {
+    "money": 70,
+    "progress": 12,
+    "quality": 55,
+    "sanity": 80,
+    "reputation": 50
+  },
   "max_turns": 12,
   "event_pool": [
+    "vc_k1_architecture",
+    "vc_k2_testing",
+    "vc_k3_scope_change",
+    "vc_k4_agent_crud",
+    "vc_k5_incident",
+    "vc_k5_prod_blast",
+    "vc_k5_exposed",
+    "vc_k6_demo_day",
     "vc_001_overengineering",
     "vc_002_prod_incident",
     "vc_003_hallucinated_api",

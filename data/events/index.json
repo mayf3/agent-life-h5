@@ -49,5 +49,13 @@
  "vc_022_offline_demo",
  "vc_023_hallucinated_metric",
  "vc_024_friend_project",
- "vc_fallback_daily"
+ "vc_fallback_daily",
+ "vc_k1_architecture",
+ "vc_k2_testing",
+ "vc_k3_scope_change",
+ "vc_k4_agent_crud",
+ "vc_k5_exposed",
+ "vc_k5_incident",
+ "vc_k5_prod_blast",
+ "vc_k6_demo_day"
 ]
