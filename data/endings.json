@@ -10,7 +10,8 @@
         "stats_max": {
           "money": 0
         }
-      }
+      },
+      "tone": "bad"
     },
     {
       "id": "_meltdown",
@@ -22,7 +23,8 @@
         "stats_max": {
           "sanity": 0
         }
-      }
+      },
+      "tone": "bad"
     },
     {
       "id": "lc_data_gone",
@@ -34,7 +36,8 @@
         "flags_all": [
           "data_lost_permanently"
         ]
-      }
+      },
+      "tone": "bad"
     },
     {
       "id": "vc_refund_apocalypse",
@@ -49,7 +52,8 @@
         "stats_max": {
           "money": 50
         }
-      }
+      },
+      "tone": "bad"
     },
     {
       "id": "vc_ai_backlash",
@@ -64,7 +68,8 @@
         "stats_max": {
           "reputation": 45
         }
-      }
+      },
+      "tone": "bad"
     },
     {
       "id": "_hollow",
@@ -76,7 +81,8 @@
         "flags_all": [
           "hollow_skill"
         ]
-      }
+      },
+      "tone": "bad"
     },
     {
       "id": "vc_master",
@@ -87,9 +93,11 @@
       "requires": {
         "stats_min": {
           "quality": 60,
-          "reputation": 55
+          "reputation": 60,
+          "progress": 50
         }
-      }
+      },
+      "tone": "good"
     },
     {
       "id": "vc_shipped_mess",
@@ -104,7 +112,8 @@
         "stats_max": {
           "quality": 45
         }
-      }
+      },
+      "tone": "mid"
     },
     {
       "id": "vc_vaporware",
@@ -119,7 +128,8 @@
         "flags_not": [
           "hollow_skill"
         ]
-      }
+      },
+      "tone": "mid"
     },
     {
       "id": "lc_legend",
@@ -130,9 +140,11 @@
       "requires": {
         "stats_min": {
           "quality": 55,
-          "reputation": 55
+          "reputation": 55,
+          "progress": 45
         }
-      }
+      },
+      "tone": "good"
     },
     {
       "id": "lc_the_rewriter",
@@ -147,7 +159,8 @@
         "stats_min": {
           "quality": 50
         }
-      }
+      },
+      "tone": "good"
     },
     {
       "id": "lc_treading_water",
@@ -157,19 +170,36 @@
       "desc": "系统没崩，也没变好。你和 agent 每天都很忙，忙出一个完美的水平线。",
       "requires": {
         "stats_min": {
-          "progress": 30
+          "progress": 25
         },
         "stats_max": {
           "quality": 45
         }
-      }
+      },
+      "tone": "mid"
     },
     {
       "id": "_the_end",
       "scenario": "any",
       "priority": -1000,
       "title": "归于平静",
-      "desc": "既没大成也没大败。你和 agent 都活着，明天继续互相伤害。"
+      "desc": "既没大成也没大败。你和 agent 都活着，明天继续互相伤害。",
+      "tone": "mid"
+    },
+    {
+      "id": "vc_delivered",
+      "scenario": "vibe_coding",
+      "priority": 96,
+      "tone": "good",
+      "title": "成功交付",
+      "desc": "项目真的交付了：进度实打实，质量站得住，客户付了尾款。你证明了一件事——AI 不是捷径，是杠杆。",
+      "requires": {
+        "stats_min": {
+          "progress": 65,
+          "quality": 55,
+          "reputation": 50
+        }
+      }
     }
   ]
 }

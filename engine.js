@@ -1,7 +1,8 @@
-// H5 精简引擎 v4——语义对齐 docs/engine-spec.md v1.2 子集。
-// 呈现层：逐条出现+打字机（可点击跳过）、结算锁定演出、数值胶囊进度/计数/震动/飘字、
-// 危机警报呼吸层、菜单视差漂浮 emoji、看板娘呼吸/果冻/情绪光晕/破折号停顿吐槽。
-// 内容与 Godot 版共用 data/*.json（语义权威 docs/engine-spec.md v1.2）。
+// engine.js v0.7 —— 呈现层 + 流程编排。规则语义全部在 rules.js（Node 可测）。
+// v0.7 修复：①回合耗尽与知识卡解耦（不再出现第 13 回合）②事件级提交锁（重复回车只结算一次）
+// ③试探=耗资源换信息后回到原事件（不结束、不免费重复）④内部标志位不再漏进玩家数值区
+// ⑤已收录知识卡只做轻提示 ⑥结局定性先行（失败/平凡/成功），小D不再在崩溃结局庆祝
+// ⑦结局条件可区分（成功交付/带伤上线/未完成/延期各有门槛，见 data/endings.json）
 "use strict";
 
 const $ = (sel) => document.querySelector(sel);
@@ -12,11 +13,12 @@ const el = (tag, cls, html) => {
   return n;
 };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const clamp = (v) => Math.max(0, Math.min(100, v));
 
-const STAT_NAMES = { money: "资金", progress: "进度", quality: "质量", sanity: "心态", reputation: "信誉" };
 const MOOD_FACES = { normal: "🙂", happy: "😄", smug: "😏", worry: "😟", panic: "😱", cheer: "🥳" };
-const MOOD_RING = { normal: "rgba(37,99,235,.25)", happy: "rgba(16,185,129,.25)", smug: "rgba(139,92,246,.28)", worry: "rgba(239,68,68,.25)", panic: "rgba(239,68,68,.35)", cheer: "rgba(16,185,129,.30)" };
+const MOOD_RING = {
+  normal: "rgba(37,99,235,.25)", happy: "rgba(16,185,129,.25)", smug: "rgba(139,92,246,.28)",
+  worry: "rgba(239,68,68,.25)", panic: "rgba(239,68,68,.35)", cheer: "rgba(16,185,129,.30)",
+};
 const WHO_BADGE = {
   user: { face: "🧑‍💻", cls: "user", tag: "YOU · 你的指令" },
   agent: { face: "🤖", cls: "agent", tag: "AGENT · 自动执行" },
@@ -26,9 +28,8 @@ const WHO_BADGE = {
 let DB = null;
 let state = null;
 let currentEvent = null;
-let pendingGoto = "";
 let probeUsed = new Set();
-let skipType = false; // 点击聊天区跳过当前打字/逐条动画
+let skipType = false;
 let lastStats = null;
 let rngState = 0;
 
@@ -39,7 +40,7 @@ const rng = () => {
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 };
 
-// ---- 收集持久化（localStorage，H5 版 user://collection.json 等价物）----
+// ---- 收集持久化（localStorage）----
 const COLL_KEY = "agent-life-cards";
 function collLoad() {
   try { return JSON.parse(localStorage.getItem(COLL_KEY) || "{}"); } catch { return {}; }
@@ -49,17 +50,8 @@ function collUnlock(cardId) {
   const c = collLoad();
   if (!c[cardId]) { c[cardId] = true; collSave(c); }
 }
-function collUnlockMany(ids) {
-  const c = collLoad();
-  let changed = false;
-  for (const id of ids) if (!c[id]) { c[id] = true; changed = true; }
-  if (changed) collSave(c);
-}
 
-// ---- 数据 ----
-// 基路径自动推导：兼容本地根路径部署与 GitHub Pages 子路径（/agent-life-h5/）
 const BASE = location.pathname.replace(/\/[^/]*$/, "/");
-
 async function loadDB() {
   const j = async (p) => (await fetch(BASE + p)).json();
   const dir = async (base) => {
@@ -78,85 +70,6 @@ async function loadDB() {
   return { scenarios, events, cards, endings: endings.endings, mascot };
 }
 
-// ---- 规则（spec v1.2 子集）----
-function checkRequires(req, st) {
-  req = req || {};
-  const t = st.turn + 1;
-  if (req.turn_min !== undefined && t < req.turn_min) return false;
-  if (req.turn_max !== undefined && t > req.turn_max) return false;
-  for (const [k, v] of Object.entries(req.stats_min || {})) if (st.stats[k] < v) return false;
-  for (const [k, v] of Object.entries(req.stats_max || {})) if (st.stats[k] > v) return false;
-  for (const f of req.flags_all || []) if (!st.flags[f]) return false;
-  for (const f of req.flags_not || []) if (st.flags[f]) return false;
-  if (req.flags_any && req.flags_any.length) {
-    if (!req.flags_any.some((f) => st.flags[f])) return false;
-  }
-  return true;
-}
-
-function effectiveWeight(ev, st) {
-  const w = ev.weight;
-  if (typeof w === "number") return Math.max(1, Math.round(w));
-  let eff = w.base || 1;
-  for (const m of w.modifiers || []) if (checkRequires(m.if, st)) eff *= m.mul;
-  return Math.max(1, Math.round(eff));
-}
-
-function pickEvent(st, scenario, forcedId) {
-  if (forcedId) {
-    const ev = DB.events[forcedId];
-    return ev && checkRequires(ev.requires, st) ? ev : null;
-  }
-  const cands = scenario.event_pool
-    .map((id) => DB.events[id])
-    .filter((ev) => ev && (ev.repeatable || !st.visited[ev.id]) && checkRequires(ev.requires, st));
-  if (!cands.length) {
-    const fb = DB.events[scenario.fallback_event];
-    return fb && (fb.repeatable || !st.visited[fb.id]) ? fb : null;
-  }
-  const total = cands.reduce((s, e) => s + effectiveWeight(e, st), 0);
-  let roll = Math.floor(rng() * total) + 1;
-  for (const ev of cands) {
-    roll -= effectiveWeight(ev, st);
-    if (roll <= 0) return ev;
-  }
-  return cands[cands.length - 1];
-}
-
-function dueFollowup(st) {
-  const nextT = st.turn + 1;
-  const kept = [];
-  let picked = "";
-  for (const f of st.followups) {
-    if (f.dueMax < nextT) continue;
-    const ev = DB.events[f.eventId];
-    if (!picked && f.dueMin <= nextT && ev && checkRequires(ev.requires, st)) { picked = f.eventId; continue; }
-    kept.push(f);
-  }
-  st.followups = kept;
-  return picked;
-}
-
-function applyEffects(effects, st) {
-  effects = effects || {};
-  for (const k of Object.keys(STAT_NAMES)) if (effects[k] !== undefined) st.stats[k] = clamp(st.stats[k] + effects[k]);
-  for (const f of effects.flags_set || []) st.flags[f] = true;
-  for (const f of effects.flags_clear || []) delete st.flags[f];
-}
-
-function resolveEnding(st) {
-  if (st.endingId) {
-    const fixed = DB.endings.find((e) => e.id === st.endingId);
-    if (fixed) return fixed;
-  }
-  const sorted = [...DB.endings].sort((a, b) => (b.priority || 0) - (a.priority || 0));
-  for (const e of sorted) {
-    if (e.scenario !== "any" && e.scenario !== st.scenarioId) continue;
-    if (checkRequires(e.requires, st)) return e;
-  }
-  return DB.endings.find((e) => e.id === "_the_end");
-}
-
 // ---- 呈现 ----
 function scrollBottom() {
   window.scrollTo({ top: document.body.scrollHeight, behavior: skipType ? "auto" : "smooth" });
@@ -173,7 +86,7 @@ function buildMsg(who, text) {
   bubble.append(span, cursor);
   row.append(bubble);
   $("#chat").append(row);
-  return { row, span, cursor, text };
+  return { span, cursor };
 }
 
 async function typeText(span, text, cursor) {
@@ -187,14 +100,10 @@ async function typeText(span, text, cursor) {
   scrollBottom();
 }
 
-// 逐条出现：淡入 + 打字机；skipType 时瞬时全出
 async function playMessages(msgs) {
   const chat = $("#chat");
   for (const { who, text } of msgs) {
-    if (skipType) {
-      chat.append(buildMsgStatic(who, text));
-      continue;
-    }
+    if (skipType) { chat.append(buildMsgStatic(who, text)); continue; }
     const node = buildMsg(who, text);
     chat.append(node.row);
     scrollBottom();
@@ -212,7 +121,8 @@ function buildMsgStatic(who, text) {
   const bubble = el("div", "bubble");
   bubble.append(el("div", "who-tag", meta.tag));
   bubble.append(el("span", "", text));
-  return row.append(bubble), row;
+  row.append(bubble);
+  return row;
 }
 
 function renderTop(st, changed, prev) {
@@ -220,39 +130,20 @@ function renderTop(st, changed, prev) {
   $("#turn").textContent = `第 ${cur}/${st.maxTurns} 回合`;
   const bar = $("#stats");
   bar.innerHTML = "";
-  for (const k of Object.keys(STAT_NAMES)) {
+  for (const k of Rules.STAT_KEYS) {
     const v = st.stats[k];
-    const pill = el("div", "pill" + (v < 30 ? " bad" : v >= 60 ? " good" : "") + (changed && changed.has(k) ? " flash" : "") + (changed && changed.has(k) && prev && v < prev[k] ? " shake" : ""));
+    const pill = el("div", "pill" + (v < 30 ? " bad" : v >= 60 ? " good" : "")
+      + (changed && changed.has(k) ? " flash" : "")
+      + (changed && changed.has(k) && prev && v < prev[k] ? " shake" : ""));
     pill.dataset.key = k;
     const fill = el("span", "fill");
     fill.style.width = v + "%";
     pill.append(fill);
-    pill.append(el("span", "pname", STAT_NAMES[k]));
+    pill.append(el("span", "pname", Rules.STAT_NAMES[k]));
     pill.append(el("b", "", String(v)));
-    // 悬停选项时的预判指示点（Reigns 机制）
-    const dot = el("span", "predot");
-    pill.append(dot);
+    pill.append(el("span", "predot"));
     bar.append(pill);
   }
-}
-
-function renderEvent() {
-  const st = state;
-  skipType = false;
-  $("#chat").innerHTML = "";
-  $("#choices").innerHTML = "";
-  const ev = currentEvent;
-  const head = el("div", "title-row");
-  head.append(el("span", "bar"));
-  head.append(el("h1", "", `${ev.icon || ""} ${ev.title || ""}`));
-  $("#chat").append(head);
-  const msgs = [];
-  if (st.turn === 0 && st.scenario.intro) msgs.push({ who: "system", text: st.scenario.intro });
-  for (const m of ev.chat || []) msgs.push({ who: m.who, text: m.text });
-  playMessages(msgs).then(() => {
-    renderTop(st);
-    renderChoices();
-  });
 }
 
 function renderChoices() {
@@ -263,16 +154,14 @@ function renderChoices() {
   for (const c of currentEvent.choices || []) {
     const isProbe = !!c.probe;
     if (isProbe && probeUsed.has(currentEvent.id + "/" + c.id)) continue;
-    if (!checkRequires(c.requires, st)) continue;
+    if (!Rules.checkRequires(c.requires, st)) continue;
     n += 1;
     const btn = el("button", "choice" + (isProbe ? " probe" : ""));
     btn.append(el("span", "bar"));
-    const num = el("span", "num", String(n));
-    btn.append(num);
+    btn.append(el("span", "num", String(n)));
     if (isProbe) btn.append(el("span", "tagchip", "试探"));
     btn.append(el("span", "ctext", c.text));
-    // 悬停预判：点亮该选项影响的属性胶囊指示点
-    const affected = Object.keys(c.effects || {}).filter((k) => STAT_NAMES[k]);
+    const affected = Object.keys(c.effects || {}).filter((k) => Rules.STAT_NAMES[k]);
     btn.addEventListener("mouseenter", () => {
       document.querySelectorAll("#stats .pill").forEach((p) => {
         p.classList.toggle("pred", affected.includes(p.dataset.key));
@@ -288,35 +177,27 @@ function renderChoices() {
 
 function showDeltas(deltas) {
   const parts = [];
-  for (const [k, v] of Object.entries(deltas || {})) {
+  for (const k of Rules.STAT_KEYS) {
+    const v = deltas ? deltas[k] : undefined;
     if (!v) continue;
-    parts.push(`<span class="${v > 0 ? "up" : "down"}">${STAT_NAMES[k]} ${v > 0 ? "+" : ""}${v}</span>`);
+    parts.push(`<span class="${v > 0 ? "up" : "down"}">${Rules.STAT_NAMES[k]} ${v > 0 ? "+" : ""}${v}</span>`);
   }
   if (parts.length) $("#chat").append(el("div", "deltas", "◆ " + parts.join(" ｜ ")));
 }
 
-function mascotReact(slot) {
-  const pool = DB.mascot.slots[slot] || [];
-  if (!pool.length) return;
-  const e = pool[Math.floor(rng() * pool.length)];
-  typeMascot(e.text, MOOD_FACES[e.mood] || "🙂", e.mood);
-}
-
-// 小D 吐槽打字机：破折号处刻意停顿 400ms（Gemini 建议：节奏演出）
 async function typeMascot(text, face, mood) {
   const line = $("#m-line");
   const faceEl = $("#m-face");
   line.textContent = "";
   faceEl.textContent = face;
-  faceEl.classList.remove("pop");
+  faceEl.classList.remove("jelly");
   void faceEl.offsetWidth;
   faceEl.classList.add("jelly");
   $("#mascot").style.setProperty("--ring", MOOD_RING[mood] || MOOD_RING.normal);
   for (let i = 0; i < text.length; i++) {
-    const two = text.slice(i, i + 2);
-    if (two === "——") {
+    if (text.slice(i, i + 2) === "——") {
       line.textContent += "——";
-      await sleep(400);
+      if (!skipType) await sleep(400);
       i += 1;
       continue;
     }
@@ -325,9 +206,15 @@ async function typeMascot(text, face, mood) {
   }
   setTimeout(() => faceEl.classList.remove("jelly"), 460);
 }
+function mascotReact(slot) {
+  const pool = DB.mascot.slots[slot] || [];
+  if (!pool.length) return;
+  const e = pool[Math.floor(rng() * pool.length)];
+  typeMascot(e.text, MOOD_FACES[e.mood] || "🙂", e.mood);
+}
 function mascotReactStats(st) {
   let danger = 0, worst = 100, allGood = true;
-  for (const k of Object.keys(STAT_NAMES)) {
+  for (const k of Rules.STAT_KEYS) {
     const v = st.stats[k];
     worst = Math.min(worst, v);
     if (v < 30) danger++;
@@ -339,44 +226,36 @@ function mascotReactStats(st) {
 }
 
 function onChoice(choiceId, btnEl) {
-  skipType = true; // 选择后结果即时显示
   const st = state;
-  const choice = (currentEvent.choices || []).find((c) => c.id === choiceId);
-  if (!choice) return;
-  // 结算锁定演出：未选项淡出，选中项高亮保持 450ms
+  // 提交锁在 rules.settleChoice 内：重复点击/回车只结算一次
+  const { ok, outcome } = Rules.settleChoice(st, currentEvent, choiceId, DB.events);
+  if (!ok) return;
+  skipType = true;
   document.querySelectorAll("#choices .choice").forEach((b) => {
-    if (b !== btnEl) { b.classList.add("fade-out"); }
-    else { b.classList.add("chosen"); }
+    if (b !== btnEl) b.classList.add("fade-out");
+    else b.classList.add("chosen");
   });
-  applyEffects(choice.effects, st);
-  if (choice.card) { st.unlocked[choice.card] = true; collUnlock(choice.card); }
-  const t0 = st.turn + 1;
-  st.ledger.push({ turn: t0, title: currentEvent.title, choice: choice.text });
-  for (const f of choice.followups || []) {
-    st.followups.push({
-      eventId: f.event, dueMin: t0 + f.after_turns[0], dueMax: t0 + Math.max(f.after_turns[1], f.after_turns[0]),
-    });
+  if (outcome.card) collUnlock(outcome.card);
+  if (outcome.result) {
+    $("#chat").append(buildMsgStatic(outcome.result.who, outcome.result.text));
   }
-  pendingGoto = choice.goto || "";
-  const changed = new Set(Object.keys(choice.effects || {}).filter((k) => STAT_NAMES[k]));
-  if (choice.result) addMsg(choice.result.who, choice.result.text);
-  showDeltas(choice.effects);
-  renderTop(st, changed, lastStats);
+  showDeltas(outcome.deltas);
+  renderTop(st, new Set(Object.keys(outcome.deltas)), lastStats);
   lastStats = { ...st.stats };
-  mascotReactStats(st);
-  const broke = st.stats.money <= 0, meltdown = st.stats.sanity <= 0;
-  st.turn += 1;
-  if (broke || meltdown) {
-    st.finished = true;
-    st.endingId = broke ? "_broke" : "_meltdown";
-    setTimeout(() => { updateAlarm(st); showEnding(); }, 550);
+  scrollBottom();
+  const ended = outcome.ended;
+  const cardId = outcome.card;
+  if (outcome.probe) {
+    // 试探：回到当前事件继续正式决策（不消耗回合）
+    mascotReactStats(st);
+    setTimeout(renderChoices, 450);
     return;
   }
-  const showCardNext = !!choice.card;
-  const reachEnd = st.turn >= st.maxTurns;
+  if (ended) updateAlarm(st);
+  mascotReactStats(st);
   setTimeout(() => {
-    if (showCardNext) showCard(choice.card);
-    else if (reachEnd) { st.finished = true; showEnding(); }
+    if (cardId) showCard(cardId);
+    else if (st.finished) showEnding();
     else showContinue();
   }, 550);
 }
@@ -397,22 +276,32 @@ function showContinue() {
 function nextTurn() {
   const st = state;
   skipType = false;
-  let forced = pendingGoto;
-  pendingGoto = "";
-  if (!forced) forced = dueFollowup(st);
-  currentEvent = pickEvent(st, st.scenario, forced);
+  let forced = Rules.takePendingGoto();
+  if (!forced) forced = Rules.dueFollowup(st, DB.events);
+  currentEvent = Rules.pickEvent(st, st.scenario, DB.events, forced, rng);
   if (!currentEvent) { st.finished = true; showEnding(); return; }
   st.visited[currentEvent.id] = true;
-  probeUsed.clear();
+  probeUsed = new Set();
+  st.committed = false; // 新事件解锁提交
   renderEvent();
 }
 
 function showCard(cardId) {
   const card = DB.cards[cardId];
+  const already = collLoad()[cardId];
+  const finish = () => { state.finished ? showEnding() : showContinue(); };
+  // v0.7：已收录只做轻提示，不再弹大卡、不多出一次“继续”
+  if (already) {
+    const toast = el("div", "toast", `${card.icon || ""} 《${card.name}》已在图鉴中`);
+    document.body.append(toast);
+    setTimeout(() => toast.remove(), 1400);
+    setTimeout(finish, 400);
+    return;
+  }
   const ov = el("div", "overlay");
   const p = el("div", "panel card-panel");
   p.append(el("div", "warnbar"));
-  p.append(el("div", "tag", "坑点卡 · 已收录图鉴"));
+  p.append(el("div", "tag", "坑点卡 · 新收录"));
   p.append(el("h2", "", `${card.icon || ""} ${card.name}（威胁等级：${card.severity}）`));
   p.append(el("p", "", "是什么：" + card.essence));
   p.append(el("p", "", "为什么会发生：" + card.why));
@@ -422,7 +311,7 @@ function showCard(cardId) {
   p.append(defenseBox);
   const row = el("div", "btn-row");
   const btn = el("button", "primary", "收下，继续 →");
-  btn.onclick = () => { ov.remove(); state.finished ? showEnding() : showContinue(); };
+  btn.onclick = () => { ov.remove(); finish(); };
   row.append(btn);
   p.append(row);
   ov.append(p);
@@ -433,23 +322,26 @@ function showEnding() {
   const st = state;
   skipType = true;
   updateAlarm(st);
-  mascotReact(st.endingId === "_the_end" || st.endingId === "" ? "ending_mid" : "ending_good");
-  const ending = resolveEnding(st);
+  // v0.7：先确定最终结局与定性，再驱动小D——失败结局绝不庆祝
+  const ending = Rules.resolveEnding(st, DB.endings);
+  const tone = Rules.endingTone(ending);
+  mascotReact(tone === "good" ? "ending_good" : tone === "bad" ? "ending_bad" : "ending_mid");
   const ov = el("div", "overlay");
   const p = el("div", "panel");
-  p.append(el("div", "tag", "ENDING // 结局归档"));
+  p.append(el("div", "tag", "ENDING // 结局归档 · " + (tone === "good" ? "成功" : tone === "bad" ? "失败" : "平凡")));
   p.append(el("h2", "", ending.title || ""));
   p.append(el("p", "", ending.desc || ""));
   const stats = el("div", "stats");
   const cell = (l, v) => { const d = el("div"); d.append(el("i", "", l)); d.append(el("b", "", String(v))); return d; };
   stats.append(cell("回合", st.turn));
-  for (const k of Object.keys(STAT_NAMES)) stats.append(cell(STAT_NAMES[k], st.stats[k]));
+  for (const k of Rules.STAT_KEYS) stats.append(cell(Rules.STAT_NAMES[k], st.stats[k]));
   p.append(stats);
   const coll = collLoad();
   const totalUnlocked = Object.keys(DB.cards).filter((cid) => st.unlocked[cid] || coll[cid]).length;
   p.append(el("p", "", `坑点图鉴 ${totalUnlocked}/${Object.keys(DB.cards).length}（跨局累计）`));
   const ledger = el("div", "ledger");
-  const ledgerText = st.ledger.slice(-5).map((e) => `第${e.turn}回合｜${e.title} → ${e.choice}`).join("<br>");
+  const ledgerText = st.ledger.slice(-6).map((e) =>
+    `第${e.turn}回合｜${e.title} → ${e.choice}${e.probe ? "（试探）" : ""}`).join("<br>");
   if (ledgerText) ledger.innerHTML = "本局关键抉择：<br>" + ledgerText;
   p.append(ledger);
   const row = el("div", "btn-row");
@@ -463,15 +355,13 @@ function showEnding() {
   document.body.append(ov);
 }
 
-// ---- 危机警报呼吸层（数值 <25 时全屏红晕）----
 function updateAlarm(st) {
   const alarm = $("#alarm");
   if (!alarm) return;
-  const danger = Object.keys(STAT_NAMES).some((k) => st.stats[k] < 25 && k !== "progress");
+  const danger = Rules.STAT_KEYS.some((k) => st.stats[k] < 25 && k !== "progress");
   alarm.classList.toggle("on", danger && !st.finished);
 }
 
-// ---- 主菜单 ----
 function showMenu() {
   const app = $("#app");
   app.innerHTML = "";
@@ -485,21 +375,18 @@ function showMenu() {
   ];
   for (const d of DECO) {
     const deco = el("div", "deco", d.e);
-    deco.style.left = d.x;
-    deco.style.top = d.y;
-    deco.style.fontSize = d.s + "px";
-    if (d.far) { deco.classList.add("far"); }
+    deco.style.left = d.x; deco.style.top = d.y; deco.style.fontSize = d.s + "px";
+    if (d.far) deco.classList.add("far");
     menu.append(deco);
   }
   const title = el("h1", "", `<span class="en">Agent</span> <span class="cn">人生</span>`);
   const subtitle = el("div", "subtitle", "// AI Agent 被坑体验模拟器 //");
   menu.append(title, subtitle, el("div", "divider"));
   const box = el("div", "choices");
-  const primaryDefs = [
+  for (const [icon, sid, label] of [
     ["🏚️", "legacy_code", "开始：接手祖传代码"],
     ["🚀", "vibe_coding", "开始：Vibe Coding 创业记"],
-  ];
-  for (const [icon, sid, label] of primaryDefs) {
+  ]) {
     const btn = el("button", "choice primary-choice");
     btn.append(el("span", "menu-badge", icon));
     btn.append(el("span", "", label));
@@ -538,12 +425,10 @@ function showMenu() {
   const quit = el("button", "quit", "退出");
   quit.onclick = () => { document.body.innerHTML = "<div class='loading'>游戏已退出。刷新页面重新开始。</div>"; };
   menu.append(box, quit);
-  const version = el("div", "version", "v0.6-prototype · H5");
-  menu.append(version);
+  menu.append(el("div", "version", "v0.7-prototype · H5"));
   app.append(menu);
 }
 
-// 漂浮 emoji 鼠标视差（近景反向 0.02，远景 0.008）
 function enableParallax() {
   document.addEventListener("mousemove", (e) => {
     const cx = e.clientX - innerWidth / 2, cy = e.clientY - innerHeight / 2;
@@ -561,13 +446,15 @@ function startRun(scenarioId) {
   state = {
     scenarioId, scenario: sc, maxTurns: sc.max_turns,
     stats: { ...sc.start_stats }, flags: {}, turn: 0,
-    unlocked: {}, visited: {}, ledger: [], followups: [], finished: false, endingId: "",
+    unlocked: {}, visited: {}, ledger: [], followups: [],
+    finished: false, endingId: "",
+    committed: false, probeUsed: new Set(),
   };
   lastStats = { ...state.stats };
   skipType = false;
   $("#mascot").classList.remove("hidden");
   mascotReact("intro");
-  currentEvent = pickEvent(state, sc, "");
+  currentEvent = Rules.pickEvent(state, sc, DB.events, "", rng);
   state.visited[currentEvent.id] = true;
   $("#app").innerHTML = `
     <div class="topbar">
@@ -576,9 +463,37 @@ function startRun(scenarioId) {
     </div>
     <div class="chat" id="chat"></div>
     <div class="choices" id="choices"></div>`;
-  // 点击聊天区任意处 = 跳过当前打字/逐条动画（只挂聊天区，避免按钮冒泡误触发）
   $("#chat").addEventListener("click", () => { skipType = true; });
   renderEvent();
+}
+
+// 键盘 1/2/3 直选（回车重复触发由 rules.settleChoice 的提交锁兜底）
+document.addEventListener("keydown", (e) => {
+  if (!state || !currentEvent || state.committed) return;
+  const idx = ["1", "2", "3", "4"].indexOf(e.key);
+  if (idx >= 0) {
+    const btns = document.querySelectorAll("#choices .choice");
+    if (btns[idx]) btns[idx].click();
+  }
+});
+
+function renderEvent() {
+  const st = state;
+  skipType = false;
+  $("#chat").innerHTML = "";
+  $("#choices").innerHTML = "";
+  const ev = currentEvent;
+  const head = el("div", "title-row");
+  head.append(el("span", "bar"));
+  head.append(el("h1", "", `${ev.icon || ""} ${ev.title || ""}`));
+  $("#chat").append(head);
+  const msgs = [];
+  if (st.turn === 0 && st.scenario.intro) msgs.push({ who: "system", text: st.scenario.intro });
+  for (const m of ev.chat || []) msgs.push({ who: m.who, text: m.text });
+  playMessages(msgs).then(() => {
+    renderTop(st);
+    renderChoices();
+  });
 }
 
 (async function main() {
