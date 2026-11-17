@@ -57,8 +57,11 @@ function collUnlockMany(ids) {
 }
 
 // ---- 数据 ----
+// 基路径自动推导：兼容本地根路径部署与 GitHub Pages 子路径（/agent-life-h5/）
+const BASE = location.pathname.replace(/\/[^/]*$/, "/");
+
 async function loadDB() {
-  const j = async (p) => (await fetch(p)).json();
+  const j = async (p) => (await fetch(BASE + p)).json();
   const dir = async (base) => {
     const list = await j(`data/${base}/index.json`);
     const out = {};
@@ -231,6 +234,25 @@ function renderTop(st, changed, prev) {
     pill.append(dot);
     bar.append(pill);
   }
+}
+
+function renderEvent() {
+  const st = state;
+  skipType = false;
+  $("#chat").innerHTML = "";
+  $("#choices").innerHTML = "";
+  const ev = currentEvent;
+  const head = el("div", "title-row");
+  head.append(el("span", "bar"));
+  head.append(el("h1", "", `${ev.icon || ""} ${ev.title || ""}`));
+  $("#chat").append(head);
+  const msgs = [];
+  if (st.turn === 0 && st.scenario.intro) msgs.push({ who: "system", text: st.scenario.intro });
+  for (const m of ev.chat || []) msgs.push({ who: m.who, text: m.text });
+  playMessages(msgs).then(() => {
+    renderTop(st);
+    renderChoices();
+  });
 }
 
 function renderChoices() {
