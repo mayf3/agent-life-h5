@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent 人生 · H5 预览</title>
+<style>
+/* v3 视觉体系（对齐 Godot 版 + Gemini 参数 2026-11-17）+ 动效层：暖纸亮色 / 卡片厚边投影 / 双色光斑 / 逐条出现+打字机 */
+:root{
+  --bg:#f6f4ef; --panel:#ffffff; --text:#1f2937; --subtle:#6b7280;
+  --accent:#2563eb; --good:#059669; --bad:#dc2626; --warn:#b45309;
+  --border:#e2dfd6; --divider:#e5e1d8; --shadow:rgba(46,41,26,.08);
+  --u-bg:#eff6ff; --a-bg:#ecfdf5; --s-bg:#fffbeb;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:#e8e2d5}
+body{
+  font-family:"PingFang SC","Noto Sans SC",sans-serif;color:var(--text);min-height:100vh;
+  background:
+    radial-gradient(circle 460px at -60px -80px, rgba(59,130,246,.10), transparent 70%),
+    radial-gradient(circle 420px at calc(100% + 80px) calc(100% + 60px), rgba(242,166,64,.12), transparent 70%),
+    radial-gradient(120% 130% at 50% 30%, #fdfcf9 0%, #f4f1e8 55%, #e8e2d5 100%);
+  background-attachment:fixed;
+}
+#app{max-width:900px;margin:0 auto;padding:0 20px 60px}
+
+/* 顶栏托盘 */
+.topbar{position:sticky;top:0;z-index:9;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:12px 18px;margin:0 -20px 18px;background:rgba(255,255,255,.62);
+  border-bottom:1px solid #e6e0d4;backdrop-filter:blur(6px)}
+.scenario{font-size:21px;font-weight:700;color:var(--accent)}
+.turn{color:var(--subtle);font-size:14px}
+.spacer{flex:1}
+.pill{background:#fff;border:1px solid var(--border);border-radius:14px;padding:6px 13px;font-size:13px;
+  color:var(--subtle);display:flex;gap:7px;align-items:center;box-shadow:0 3px 8px var(--shadow)}
+.pill b{font-size:17px;font-weight:700;color:var(--text)}
+.pill.bad{border-color:rgba(220,38,38,.5)} .pill.bad b{color:var(--bad)}
+.pill.good{border-color:rgba(5,150,105,.45)} .pill.good b{color:var(--good)}
+.pill.flash{animation:pillFlash .6s ease}
+@keyframes pillFlash{30%{box-shadow:0 0 0 5px rgba(37,99,235,.18);transform:scale(1.08)}}
+
+/* 聊天区：逐条入场 + 打字机 */
+.chat{display:flex;flex-direction:column;gap:14px}
+.msg{display:flex;gap:12px;align-items:flex-start;opacity:0;transform:translateY(14px);animation:msgIn .38s ease forwards}
+@keyframes msgIn{to{opacity:1;transform:none}}
+.badge{flex:0 0 46px;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:21px;border:1px solid;box-shadow:0 3px 8px var(--shadow)}
+.badge.user{background:var(--u-bg);border-color:rgba(37,99,235,.55)}
+.badge.agent{background:var(--a-bg);border-color:rgba(5,150,105,.55)}
+.badge.system{background:var(--s-bg);border-color:rgba(180,83,9,.5)}
+.bubble{flex:1;background:#fff;border:1px solid var(--border);border-bottom-width:3px;border-radius:12px;
+  padding:13px 17px;box-shadow:0 5px 14px var(--shadow);font-size:17px;line-height:1.8}
+.msg.user .bubble{background:var(--u-bg)} .msg.agent .bubble{background:var(--a-bg)} .msg.system .bubble{background:var(--s-bg);color:#475569}
+.cursor{display:inline-block;width:10px;color:var(--accent);animation:blink .8s steps(1) infinite;font-weight:700}
+@keyframes blink{50%{opacity:0}}
+.title-row{display:flex;align-items:center;gap:12px;margin:14px 0 8px}
+.title-row .bar{flex:0 0 6px;height:34px;border-radius:3px;background:var(--accent)}
+.title-row h1{font-size:27px;font-weight:800;letter-spacing:.5px}
+.deltas{color:var(--subtle);font-size:14px;padding:4px 6px;animation:msgIn .3s ease}
+.deltas .up{color:var(--good);font-weight:700} .deltas .down{color:var(--bad);font-weight:700}
+
+/* 选项区 */
+.choices{margin-top:24px;border-top:1px solid var(--divider);padding-top:18px;display:flex;flex-direction:column;gap:12px}
+.choice{
+  position:relative;display:flex;gap:13px;align-items:stretch;width:100%;text-align:left;cursor:pointer;
+  background:#fff;border:1px solid var(--border);border-bottom-width:3px;border-radius:12px;
+  padding:15px 18px 15px 15px;font-size:16px;line-height:1.6;color:var(--text);
+  box-shadow:0 5px 16px var(--shadow);
+  transition:transform .16s cubic-bezier(.34,1.56,.64,1),box-shadow .16s ease,background .16s ease,border-color .16s ease;
+  animation:msgIn .3s ease backwards}
+.choice:nth-child(2){animation-delay:.06s} .choice:nth-child(3){animation-delay:.12s} .choice:nth-child(4){animation-delay:.18s}
+.choice:hover{transform:scale(1.015);background:var(--u-bg);border-color:var(--accent);
+  border-bottom-width:4px;box-shadow:0 8px 22px rgba(37,99,235,.18)}
+.choice:active{transform:scale(.985);border-bottom-width:1px;box-shadow:0 2px 5px var(--shadow)}
+.choice .bar{flex:0 0 4px;border-radius:2px;background:var(--accent)}
+.choice .num{flex:0 0 28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;align-self:center}
+.choice.probe .num{background:var(--warn)}
+.choice.probe{color:#92400e}
+.choice.probe .bar{background:var(--warn)}
+.choice.probe:hover{background:#fffbeb;border-color:var(--warn);box-shadow:0 8px 22px rgba(180,83,9,.16)}
+.tagchip{flex:0 0 auto;background:rgba(180,83,9,.12);color:#92400e;border-radius:6px;padding:2px 9px;
+  font-size:12px;font-weight:700;align-self:center}
+.continue-btn{background:linear-gradient(180deg,#3b82f6,#2563eb);color:#fff;border:none;border-bottom:3px solid #1e40af;
+  border-radius:12px;padding:15px;font-size:17px;font-weight:600;cursor:pointer;
+  box-shadow:0 6px 18px rgba(37,99,235,.30);transition:filter .15s,transform .15s;animation:msgIn .3s ease}
+.continue-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+
+/* 主菜单 */
+.menu{position:relative;min-height:92vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden}
+.menu h1{font-size:64px;font-weight:800;letter-spacing:2px}
+.menu h1 .en{color:var(--accent)} .menu h1 .cn{color:#111827}
+.menu .subtitle{font-size:20px;color:var(--subtle);margin:10px 0 6px}
+.menu .divider{width:420px;height:1px;background:var(--divider);margin:22px 0 30px}
+.menu .choices{border-top:none;padding-top:0;width:380px;margin-top:0}
+.menu .choice{justify-content:center;font-weight:600;font-size:17px;
+  background:#fff;border-color:var(--accent);border-bottom-width:3px}
+.menu .choice .num{display:none}
+.menu .choice.subtle{border-color:var(--border);color:var(--text);font-weight:400}
+.menu .quit{margin-top:26px;background:none;border:none;color:#9ca3af;font-size:14px;cursor:pointer}
+.menu .quit:hover{color:var(--subtle)}
+.menu .version{position:fixed;right:18px;bottom:12px;font-size:12px;color:#b9b2a4}
+.deco{position:absolute;font-size:46px;opacity:.16;pointer-events:none;animation:floaty 6s ease-in-out infinite alternate}
+.deco:nth-of-type(1){top:12%;left:12%}
+.deco:nth-of-type(2){top:20%;right:14%;animation-delay:1.2s;font-size:38px}
+.deco:nth-of-type(3){bottom:18%;left:16%;animation-delay:2s;font-size:40px}
+.deco:nth-of-type(4){top:8%;right:34%;animation-delay:.6s;font-size:34px}
+.deco:nth-of-type(5){bottom:12%;right:22%;animation-delay:1.6s;font-size:42px}
+@keyframes floaty{from{transform:translateY(-10px) rotate(-6deg)}to{transform:translateY(10px) rotate(8deg)}}
+
+/* 弹层 */
+.overlay{position:fixed;inset:0;background:rgba(20,24,33,.55);display:flex;align-items:center;justify-content:center;padding:24px;z-index:20}
+.panel{background:#fff;border:1px solid #dfd9ce;border-bottom-width:3px;border-radius:22px;max-width:700px;width:100%;
+  padding:32px 36px;box-shadow:0 14px 48px rgba(15,18,26,.28);max-height:88vh;overflow:auto}
+.panel .tag{font-size:13px;color:var(--accent);letter-spacing:.5px;font-weight:600}
+.panel h2{font-size:27px;margin:6px 0 10px;font-weight:800}
+.panel p{font-size:16px;line-height:1.8;margin:8px 0;color:var(--text)}
+.panel .stats{display:flex;gap:4px;background:#f0eee6;border-radius:8px;padding:12px 8px;margin:16px 0}
+.panel .stats div{flex:1;text-align:center}
+.panel .stats i{display:block;font-style:normal;font-size:12px;color:var(--subtle);margin-bottom:2px}
+.panel .stats b{font-size:21px;font-weight:800}
+.panel .ledger{font-size:14px;color:var(--subtle);line-height:1.8;border-top:1px solid var(--divider);padding-top:12px}
+.btn-row{display:flex;justify-content:center;gap:16px;margin-top:20px}
+button.primary{background:linear-gradient(180deg,#3b82f6,#2563eb);color:#fff;border:none;border-bottom:3px solid #1e40af;
+  border-radius:12px;padding:12px 30px;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 6px 16px rgba(37,99,235,.32);transition:filter .15s}
+button.primary:hover{filter:brightness(1.08)}
+button.plain{background:#fff;border:1px solid var(--border);border-bottom-width:2px;border-radius:12px;padding:12px 30px;font-size:16px;color:var(--subtle);cursor:pointer;transition:color .15s,border-color .15s}
+button.plain:hover{color:var(--accent);border-color:var(--accent)}
+
+/* 看板娘：默认右下角紧凑版；≥1440px 宽屏切右上舞台（避开 900px 内容列） */
+#mascot{position:fixed;right:18px;bottom:18px;width:210px;text-align:center;z-index:6;
+  display:flex;flex-direction:column}
+#mascot.hidden{display:none}
+#mascot .bubble2{background:#fff;border:1px solid #d6e0f0;border-bottom-width:3px;border-radius:16px;
+  border-top-right-radius:4px;padding:12px 14px;font-size:13px;line-height:1.65;color:#334155;
+  box-shadow:0 5px 16px rgba(46,41,26,.10);margin-bottom:12px}
+#mascot .face{width:72px;height:72px;margin:0 auto;border-radius:50%;background:linear-gradient(180deg,#f2f7ff,#eef4ff);
+  border:3px solid #fff;box-shadow:0 6px 18px rgba(37,99,235,.20);display:flex;align-items:center;justify-content:center;
+  font-size:34px;transition:transform .15s cubic-bezier(.34,1.56,.64,1)}
+#mascot .face.pop{transform:scale(1.18)}
+#mascot .name{font-size:12px;font-weight:600;color:var(--subtle);margin-top:6px}
+@media (min-width:1440px){
+  #mascot{right:26px;top:110px;bottom:auto;width:250px}
+  #mascot .bubble2{font-size:14px;padding:13px 15px}
+  #mascot .face{width:96px;height:96px;font-size:44px}
+}
+.loading{text-align:center;padding:80px 20px;color:var(--subtle);font-size:16px;line-height:2}
+</style>
+</head>
+<body>
+<div id="app"><div class="loading">加载内容中……<br>请用 <code>python3 tools/serve_h5.py</code> 启动本地服务后访问。</div></div>
+<div id="mascot" class="hidden">
+  <div class="bubble2" id="m-line">我是小D，全程陪跑～</div>
+  <div class="face" id="m-face">🙂</div>
+  <div class="name">小D</div>
+</div>
+<script src="engine.js?v=4"></script>
+</body>
+</html>

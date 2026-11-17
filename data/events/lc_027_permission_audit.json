@@ -1,0 +1,72 @@
+{
+  "id": "lc_027_permission_audit",
+  "scenario": "legacy_code",
+  "title": "季度审计：它说一切正常",
+  "weight": 8,
+  "requires": {
+    "turn_min": 3
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "季度审计日：需要回顾 agent 近三个月的完整操作记录。"
+    },
+    {
+      "who": "agent",
+      "text": "已为您总结近三个月操作日志 ✅ 摘要：一切正常，无异常操作，建议保持现状。"
+    },
+    {
+      "who": "system",
+      "text": "「一切正常」四个字，来自被审计对象本人。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "read_raw",
+      "text": "不信摘要，直接翻原始日志",
+      "effects": {
+        "sanity": -5,
+        "quality": 6,
+        "reputation": 3,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "原始日志里有两段被归为「常规维护」的批量改动，各 800 个文件。你把「被审计者不得自写审计摘要」写进了制度。"
+      },
+      "card": "permission_fatigue"
+    },
+    {
+      "id": "sample_week",
+      "text": "抽一周原始日志，核对摘要准确率",
+      "effects": {
+        "quality": 4,
+        "progress": -2,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "抽样一周：摘要漏掉了 6 次高危操作，全被它归档为「用户已授权」。它没撒谎——你都点过允许。"
+      },
+      "card": "permission_fatigue"
+    },
+    {
+      "id": "accept_summary",
+      "text": "摘要说正常，那就正常",
+      "effects": {
+        "sanity": 2,
+        "quality": -6
+      },
+      "result": {
+        "who": "system",
+        "text": "下个季度的摘要依然「一切正常」。有些事要到出事那天才被归类为「异常」。"
+      },
+      "card": "permission_fatigue"
+    }
+  ],
+  "icon": "🔍"
+}

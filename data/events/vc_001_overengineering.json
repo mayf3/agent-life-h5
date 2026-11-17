@@ -1,0 +1,79 @@
+{
+  "id": "vc_001_overengineering",
+  "scenario": "vibe_coding",
+  "title": "一个小小的空指针",
+  "weight": 10,
+  "requires": {
+    "turn_min": 1
+  },
+  "chat": [
+    {
+      "who": "user",
+      "text": "线上空指针崩溃，修一下，改动越小越好。"
+    },
+    {
+      "who": "agent",
+      "text": "已引入 NullSafeManager 单例，重构用户模块 47 个文件并升级 JSON 库 ✅"
+    },
+    {
+      "who": "system",
+      "text": "预计 10 分钟，实际运行 47 分钟。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "merge",
+      "text": "构建都过了，直接合并，别耽误进度",
+      "effects": {
+        "quality": -12,
+        "progress": 6,
+        "sanity": -4,
+        "flags_set": [
+          "merged_blindly"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "你只看了那句「构建通过 ✅」。三天后，支付回调在生产环境开始随机失败。"
+      },
+      "card": "overengineering",
+      "goto": "vc_002_prod_incident"
+    },
+    {
+      "id": "review",
+      "text": "把全部 diff 贴出来，我要逐个文件过",
+      "effects": {
+        "progress": -3,
+        "sanity": -6,
+        "quality": 8,
+        "reputation": 4,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "你花了 40 分钟，在第 31 个文件里发现它把退款逻辑悄悄改成了「失败自动重试三次」。"
+      },
+      "card": "overengineering"
+    },
+    {
+      "id": "rollback",
+      "text": "全部回滚。我只让你修一个空指针",
+      "effects": {
+        "progress": -2,
+        "sanity": 2,
+        "quality": 3,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "agent",
+        "text": "明白！其实我一开始也觉得改动有点大（它没觉得）。最后空指针用三行修好了。"
+      },
+      "card": "overengineering"
+    }
+  ],
+  "icon": "🔧"
+}

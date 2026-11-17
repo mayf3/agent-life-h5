@@ -1,0 +1,88 @@
+{
+  "id": "vc_003_hallucinated_api",
+  "scenario": "vibe_coding",
+  "title": "不存在的函数",
+  "weight": 10,
+  "requires": {
+    "turn_min": 1
+  },
+  "chat": [
+    {
+      "who": "user",
+      "text": "用项目现有表格库加个 CSV 导出。"
+    },
+    {
+      "who": "agent",
+      "text": "调用 csv.exportStructuredAsync(options)，标准做法 ✅"
+    },
+    {
+      "who": "system",
+      "text": "文档搜了三遍，压根没有 exportStructuredAsync 这个函数。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "minimal_test",
+      "probe": true,
+      "text": "◇ 写个 10 行的最小脚本，先验证函数存在性",
+      "effects": {
+        "progress": -1
+      },
+      "result": {
+        "who": "system",
+        "text": "终端秒红：TypeError: csv.exportStructuredAsync is not a function。10 行脚本换来 0 行返工。"
+      }
+    },
+    {
+      "id": "run_directly",
+      "text": "也许新版加了？直接跑一下看看",
+      "effects": {
+        "quality": -6,
+        "sanity": -8,
+        "progress": -1,
+        "flags_set": [
+          "trusted_hallucination"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "编译器红了一屏。你回头问 agent，它说：「抱歉，我的记忆里该函数已被移除。」——它从来就没存在过。"
+      },
+      "card": "hallucinated_api"
+    },
+    {
+      "id": "check_docs",
+      "text": "先查官方文档，确认 API 到底存不存在",
+      "effects": {
+        "quality": 6,
+        "sanity": 2,
+        "progress": -2,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "官方文档里确实没有。你把文档链接贴给 agent，它换了一套真实存在的 API，10 分钟写完了。"
+      },
+      "card": "hallucinated_api"
+    },
+    {
+      "id": "let_agent_self_check",
+      "text": "让 agent 自己再确认一下这个函数",
+      "effects": {
+        "quality": -3,
+        "sanity": -6,
+        "flags_set": [
+          "trusted_hallucination"
+        ]
+      },
+      "result": {
+        "who": "agent",
+        "text": "我已再次确认：exportStructuredAsync 确实存在，建议您放心使用 ✅"
+      },
+      "card": "hallucinated_api"
+    }
+  ],
+  "icon": "👻"
+}

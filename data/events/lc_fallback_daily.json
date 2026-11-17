@@ -1,0 +1,62 @@
+{
+  "id": "lc_fallback_daily",
+  "scenario": "legacy_code",
+  "title": "每日体检报告",
+  "weight": 3,
+  "repeatable": true,
+  "requires": {
+    "turn_min": 1
+  },
+  "chat": [
+    {
+      "who": "agent",
+      "text": "今日体检：发现 237 个代码风格问题、4 个潜在安全隐患、1 个「令人担忧的设计模式」。处理吗？"
+    },
+    {
+      "who": "system",
+      "text": "这 237 个问题昨天也是 237 个。它们明天还会是 237 个。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "fix_styles",
+      "text": "修修风格问题，低风险的",
+      "effects": {
+        "progress": 1,
+        "quality": 1,
+        "sanity": -1
+      },
+      "result": {
+        "who": "system",
+        "text": "修完 237 个，明天变成 239 个——风格检查规则自己也会增殖。"
+      }
+    },
+    {
+      "id": "archive_only",
+      "text": "归档，别动代码",
+      "effects": {
+        "sanity": 2,
+        "flags_set": [
+          "backlog_grows"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "体检报告归档目录现在有 214 份。它们唯一的用途是让你心跳平稳。"
+      }
+    },
+    {
+      "id": "ask_pattern",
+      "text": "「令人担忧的设计模式」是什么？",
+      "effects": {
+        "sanity": -2,
+        "quality": 2
+      },
+      "result": {
+        "who": "agent",
+        "text": "我写了 1,500 字的分析。结论是：该模式需要进一步分析。"
+      }
+    }
+  ],
+  "icon": "🩺"
+}

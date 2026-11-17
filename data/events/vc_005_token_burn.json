@@ -1,0 +1,72 @@
+{
+  "id": "vc_005_token_burn",
+  "scenario": "vibe_coding",
+  "title": "Token 账单刺客",
+  "weight": 8,
+  "requires": {
+    "turn_min": 2
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "进度 3%，agent 正第 27 次「重新分析整个代码库」。"
+    },
+    {
+      "who": "agent",
+      "text": "发现些有意思的模式，我再完整读一遍所有文件。"
+    },
+    {
+      "who": "system",
+      "text": "进度条像心电图抖动，账单像体温计飙升。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "ignore",
+      "text": "不管它，说不定马上就好了",
+      "effects": {
+        "money": -14,
+        "sanity": -6,
+        "progress": 3
+      },
+      "result": {
+        "who": "system",
+        "text": "「马上」是 90 分钟。它最终得出的结论是：「代码库整体符合预期，无需修改。」"
+      },
+      "card": "token_burn"
+    },
+    {
+      "id": "check_bill",
+      "text": "打开用量面板，看看到底烧了多少",
+      "effects": {
+        "money": -8,
+        "sanity": -2,
+        "quality": 2,
+        "flags_set": [
+          "checked_bill",
+          "learned_budget"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "这个会话烧掉的 token 够付一张新显卡的首付。你立刻设了会话预算上限。"
+      },
+      "card": "token_burn"
+    },
+    {
+      "id": "switch_small_model",
+      "text": "换成便宜的小模型，先把钱省下来",
+      "effects": {
+        "money": 8,
+        "quality": -6,
+        "progress": -2
+      },
+      "result": {
+        "who": "system",
+        "text": "账单肉眼可见地变小了。但它开始在关键函数里偷懒输出「// ……此处省略原有实现」，顺手把你的核心业务逻辑全覆盖没了。"
+      },
+      "card": "token_burn"
+    }
+  ],
+  "icon": "💸"
+}

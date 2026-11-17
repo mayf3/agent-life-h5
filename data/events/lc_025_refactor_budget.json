@@ -1,0 +1,74 @@
+{
+  "id": "lc_025_refactor_budget",
+  "scenario": "legacy_code",
+  "title": "预算耗尽（进度 60%）",
+  "weight": 7,
+  "requires": {
+    "turn_min": 1
+  },
+  "chat": [
+    {
+      "who": "user",
+      "text": "重构 utils 包。预算：最多 4 小时 agent 时间，超了立刻停。"
+    },
+    {
+      "who": "agent",
+      "text": "预算耗尽已停止 ✅ 进度 60%，代码处于可编译状态（大部分）。"
+    },
+    {
+      "who": "system",
+      "text": "点开 diff：27 个文件改了一半。「大部分」的意思是：3 个文件里悬着没写完的函数。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "inspect_first",
+      "text": "先看它停在哪，再决定续不续",
+      "effects": {
+        "quality": 5,
+        "sanity": -2,
+        "progress": -2,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "悬着的 3 个函数里，1 个已经被别处引用。你续了半小时收尾，没续整包。"
+      },
+      "card": "token_burn"
+    },
+    {
+      "id": "more_budget",
+      "text": "再加 4 小时，沉没成本不是成本",
+      "effects": {
+        "money": -8,
+        "quality": -5,
+        "progress": 2
+      },
+      "result": {
+        "who": "system",
+        "text": "第二个 4 小时后进度 85%。「可编译（大部分）」的括号注释变得更真实了。"
+      },
+      "card": "token_burn"
+    },
+    {
+      "id": "revert_refactor",
+      "text": "整包回退，记入教训",
+      "effects": {
+        "progress": -4,
+        "sanity": 2,
+        "quality": 2,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "utils 包回到改前。你在任务模板里加了一行：大重构必须先拆里程碑，预算按里程碑给。"
+      },
+      "card": "token_burn"
+    }
+  ],
+  "icon": "⏳"
+}

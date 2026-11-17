@@ -1,0 +1,76 @@
+{
+  "id": "lc_016_rewrite_module",
+  "scenario": "legacy_code",
+  "title": "三年没人敢动的模块",
+  "weight": 9,
+  "requires": {
+    "turn_min": 3
+  },
+  "chat": [
+    {
+      "who": "user",
+      "text": "promo_engine 这个模块折扣计算偶发不对，帮我看看。"
+    },
+    {
+      "who": "agent",
+      "text": "通读 12,000 行后建议整体重写，我两天内可交付新版 ✅"
+    },
+    {
+      "who": "system",
+      "text": "里面埋着九年促销特例，零文档零测试。注释留着三句「祝你好运」，署名全已离职。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "surgical_fix",
+      "text": "拒绝重写。只修折扣计算，其他一行不动",
+      "effects": {
+        "quality": 6,
+        "progress": -2,
+        "sanity": -4,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "修好了，改动 11 行。你把其中一句「祝你好运」的注释抄进了自己的笔记本。"
+      },
+      "card": "overengineering"
+    },
+    {
+      "id": "rewrite_all",
+      "text": "就重写吧，反正已经烂透了",
+      "effects": {
+        "progress": -6,
+        "quality": -8,
+        "sanity": -4,
+        "flags_set": [
+          "rewrote_anyway"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "两个月后新模块上线。漏掉的促销特例开始排队回来报到，每一个都带着一位愤怒的客户。"
+      },
+      "card": "overengineering"
+    },
+    {
+      "id": "document_first",
+      "text": "先让它补文档和测试，再谈修",
+      "effects": {
+        "progress": -5,
+        "quality": 7,
+        "sanity": -2,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "它写了 60 个测试，跑完现网代码后 42 个失败。你第一次看清了这个模块的真面目——以及前任们沉默的原因。"
+      }
+    }
+  ],
+  "icon": "🏛️"
+}

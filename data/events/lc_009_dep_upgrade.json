@@ -1,0 +1,68 @@
+{
+  "id": "lc_009_dep_upgrade",
+  "scenario": "legacy_code",
+  "title": "修复一个 CVE 的代价",
+  "weight": 7,
+  "requires": {
+    "turn_min": 2
+  },
+  "chat": [
+    {
+      "who": "user",
+      "text": "报了个中危 CVE，把那个库升到安全版本。就这一个，别的不动。"
+    },
+    {
+      "who": "agent",
+      "text": "已从 2.3.1 升到最新 2.9.4 ✅ 构建通过，顺带升了 14 个依赖，删了 3 个「废弃」脚本。"
+    },
+    {
+      "who": "system",
+      "text": "2.4.0 起日期解析时区变了。明早日报起，你的报表时间戳将整体偏移 8 小时。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "pin_minor",
+      "text": "退回，只升到安全公告说的 2.3.7",
+      "effects": {
+        "quality": 5,
+        "progress": -3,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "CVE 修了，报表没炸。你给它立了新规：依赖升级只允许最小跨度，一步一验。"
+      },
+      "card": "overengineering"
+    },
+    {
+      "id": "latest_all",
+      "text": "都最新了，干脆框架也一起升",
+      "effects": {
+        "quality": -10,
+        "sanity": -8,
+        "progress": -4
+      },
+      "result": {
+        "who": "system",
+        "text": "接下来三天，构建系统进入「修一个坏两个」的量子状态。CVE 依然在——框架的版本和那个库已经对不上了。"
+      },
+      "card": "overengineering"
+    },
+    {
+      "id": "ignore_cve",
+      "text": "中危而已，把扫描器这条告警关了",
+      "effects": {
+        "sanity": 3,
+        "reputation": -4
+      },
+      "result": {
+        "who": "system",
+        "text": "下个季度它升级成高危——出现在你已经忘了为什么关掉告警的那个扫描器里。"
+      }
+    }
+  ],
+  "icon": "⬆️"
+}

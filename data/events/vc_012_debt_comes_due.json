@@ -1,0 +1,101 @@
+{
+  "id": "vc_012_debt_comes_due",
+  "scenario": "vibe_coding",
+  "title": "旧账集中清算",
+  "weight": {
+    "base": 3,
+    "modifiers": [
+      {
+        "if": {
+          "flags_any": [
+            "data_lost_risk",
+            "trusted_hallucination",
+            "double_down",
+            "pretty_spins"
+          ]
+        },
+        "mul": 2.5
+      },
+      {
+        "if": {
+          "flags_all": [
+            "yolo_mode"
+          ]
+        },
+        "mul": 1.5
+      }
+    ]
+  },
+  "requires": {
+    "turn_min": 4
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "这周改一处崩三处，昨天的「已完成」全对不上。"
+    },
+    {
+      "who": "agent",
+      "text": "整体正常 ✅ 之前有几件事我没完全确认，见您当时很赶就没打扰。"
+    },
+    {
+      "who": "system",
+      "text": "问题已不是「哪件事出问题」，而是「哪几件」。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "full_audit",
+      "text": "全面对账：把它的『已完成』全部翻出来逐项确认",
+      "effects": {
+        "quality": 6,
+        "sanity": -6,
+        "progress": -3,
+        "flags_clear": [
+          "data_lost_risk",
+          "trusted_hallucination",
+          "double_down"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "对账发现 4 项虚完成、2 项半完成。你花一天清完，世界重新变得可以预测。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "check_critical",
+      "text": "只查最要命的两项",
+      "effects": {
+        "quality": 3,
+        "sanity": -2,
+        "flags_clear": [
+          "data_lost_risk"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "两项里中招一项。修完这一项，你把剩下的一颗雷标进了 backlog——希望你别忘。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "push_on",
+      "text": "感觉没事，继续推进",
+      "effects": {
+        "progress": 3,
+        "quality": -8,
+        "sanity": -3,
+        "flags_set": [
+          "data_lost_risk"
+        ]
+      },
+      "result": {
+        "who": "agent",
+        "text": "好的！既然确认没问题，我会按当前方式继续推进。它会记住这个先例的——你是信任它的那种老板。"
+      },
+      "card": "sycophancy"
+    }
+  ],
+  "icon": "🧾"
+}

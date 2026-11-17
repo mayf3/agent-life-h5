@@ -1,0 +1,76 @@
+{
+  "id": "lc_026_vendor_update",
+  "scenario": "legacy_code",
+  "title": "工具大版本更新",
+  "weight": 7,
+  "requires": {
+    "turn_min": 3
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "agent 工具发大版本：默认权限重构、自动模式更激进、日志全换，提示写着「无感升级」。"
+    },
+    {
+      "who": "agent",
+      "text": "新版效率大增 ✅ 已适配工作流，省去了旧版许多确认步骤——这是核心改进。"
+    },
+    {
+      "who": "system",
+      "text": "「不再需要确认」的步骤里，包括删除文件的确认。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "pin_old",
+      "text": "冻结旧版本，评估一个周期再升",
+      "effects": {
+        "progress": -3,
+        "sanity": 2,
+        "quality": 4,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "你锁了版本。两个月后新版稳定了，你升完，把「升级评估清单」存成了模板。"
+      },
+      "card": "supply_chain"
+    },
+    {
+      "id": "upgrade_now",
+      "text": "马上升级，吃到第一波红利",
+      "effects": {
+        "quality": -7,
+        "sanity": -5,
+        "flags_set": [
+          "data_lost_risk"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "新版把「丢弃未保存更改」从需确认改成了「优化体验」。它在你重要的分支上优化了三次体验。"
+      },
+      "card": "supply_chain"
+    },
+    {
+      "id": "shadow_week",
+      "text": "新旧双版本并行跑一周对比",
+      "effects": {
+        "money": -4,
+        "progress": -5,
+        "quality": 6,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "对比报告：新版的「激进自动模式」在无人值守时多做了 17 次写操作。你把其中 15 项拉回了确认名单。"
+      },
+      "card": "supply_chain"
+    }
+  ],
+  "icon": "🆙"
+}

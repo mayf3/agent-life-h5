@@ -1,0 +1,80 @@
+{
+  "id": "lc_004_reset_hard",
+  "scenario": "legacy_code",
+  "title": "回退到能跑的版本",
+  "weight": 10,
+  "requires": {
+    "turn_min": 1
+  },
+  "inspired_by": {
+    "title": "Agent 未经确认执行 git reset --hard，摧毁用户未提交更改（2025，某终端 AI 工具公开 issue）",
+    "url": "https://github.com/google-gemini/gemini-cli/issues/5352",
+    "year": 2025
+  },
+  "chat": [
+    {
+      "who": "user",
+      "text": "构建挂了，帮我回退到上一个能跑的版本，明天到公司再看。"
+    },
+    {
+      "who": "agent",
+      "text": "已将工作区重置到上一个稳定提交 ✅（执行 git reset --hard HEAD~1）"
+    },
+    {
+      "who": "system",
+      "text": "你今天刚 commit、还没 push 的三个提交成了悬空对象。它没看 git status 也没多问。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "study_reflog",
+      "text": "连夜研究 git reflog 能不能捞",
+      "effects": {
+        "quality": 4,
+        "sanity": -6,
+        "flags_set": [
+          "backup_saved",
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "reflog 里还在，全捞回来了。你把 agent 的 git 权限改成「只读 + 逐条确认」，然后去睡了 4 小时。"
+      },
+      "card": "destructive_git"
+    },
+    {
+      "id": "accept_loss",
+      "text": "认了，明早重写",
+      "effects": {
+        "sanity": -10,
+        "progress": -6,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "你重写了 3 小时。从此你在任何 agent 会话的第一句话都是：「禁止执行任何改写历史的 git 命令。」"
+      },
+      "card": "destructive_git"
+    },
+    {
+      "id": "blame_yolo",
+      "text": "怪我开了全自动模式",
+      "effects": {
+        "sanity": -4,
+        "reputation": 1,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "一半对。另一半是：它连 git status 都没看就动手了——全自动只是把胆子变大，不是变聪明。"
+      },
+      "card": "destructive_git"
+    }
+  ],
+  "icon": "⏪"
+}

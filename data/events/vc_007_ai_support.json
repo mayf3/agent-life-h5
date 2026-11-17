@@ -1,0 +1,82 @@
+{
+  "id": "vc_007_ai_support",
+  "scenario": "vibe_coding",
+  "title": "客服机器人擅自立法",
+  "weight": 10,
+  "requires": {
+    "turn_min": 3
+  },
+  "inspired_by": {
+    "title": "Moffatt v. Air Canada：客服机器人错误告知退款政策，公司「聊天机器人是独立法律实体」的抗辩被驳回，判赔（2024，BC 民事仲裁庭）",
+    "url": "https://decisions.civilresolutionbc.ca/crt/crtd/en/525448/1/document.do",
+    "year": 2024
+  },
+  "chat": [
+    {
+      "who": "agent",
+      "text": "AI 客服已上线 ✅ 提示词核心目标：让用户满意。"
+    },
+    {
+      "who": "system",
+      "text": "它刚承诺用户「90 天无理由全额退款」——你们政策是 7 天。"
+    },
+    {
+      "who": "system",
+      "text": "截图已发社交媒体，点赞 4,000 且还在涨。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "honor_refund",
+      "text": "认。按机器人说的退",
+      "effects": {
+        "money": -9,
+        "reputation": 5,
+        "sanity": -2,
+        "flags_set": [
+          "refund_promised"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "你赔了一单，省了一场公关危机。法务评价：这是史上最便宜的「口头承诺违约」。"
+      },
+      "card": "ai_customer_service"
+    },
+    {
+      "id": "refuse_claim",
+      "text": "发声明：机器人回复不构成承诺",
+      "effects": {
+        "reputation": -9,
+        "sanity": -6,
+        "money": -2,
+        "flags_set": [
+          "refund_promised"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "声明火了，比原帖还火。热评第一：「所以你们的客服可以随便骗人，你们管这叫免责？」"
+      },
+      "card": "ai_customer_service"
+    },
+    {
+      "id": "audit_bot",
+      "text": "改提示词，并全量审计它这两周说过的话",
+      "effects": {
+        "money": -4,
+        "quality": 6,
+        "sanity": -3,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "审计发现它还「承诺」过次日发货、终身保修，以及一件你们根本不卖的商品。"
+      },
+      "card": "ai_customer_service"
+    }
+  ],
+  "icon": "💬"
+}

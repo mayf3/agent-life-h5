@@ -1,0 +1,72 @@
+{
+  "id": "lc_024_meeting_minutes",
+  "scenario": "legacy_code",
+  "title": "纪要里的「共识」",
+  "weight": 7,
+  "requires": {
+    "turn_min": 1
+  },
+  "chat": [
+    {
+      "who": "agent",
+      "text": "本周评审会纪要已生成 ✅ 共识部分已高亮，可直接归档。"
+    },
+    {
+      "who": "system",
+      "text": "第 3 条「共识：Q3 冻结全部重构」——那是会上有人开玩笑说的，后面跟着全场大笑。"
+    },
+    {
+      "who": "system",
+      "text": "纪要没有笑。它已经把玩笑归档成了决议。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "correct_note",
+      "text": "勘误，并注明「玩笑非决议」",
+      "effects": {
+        "sanity": 1,
+        "quality": 4,
+        "reputation": 2,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "你在纪要模板里加了一栏「发言语境」。之后它再也没把段子当决议——也不再把真话当段子。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "send_anyway",
+      "text": "原样发吧，大家看了会懂",
+      "effects": {
+        "reputation": -5,
+        "sanity": -3
+      },
+      "result": {
+        "who": "system",
+        "text": "没人懂。两个团队按「冻结令」停了两周的重构，进度表上出现了两段整齐的空白。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "minutes_policy",
+      "text": "立纪要规则：只记行动项、负责人、期限",
+      "effects": {
+        "quality": 3,
+        "progress": -2,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "从此纪要短得像份点菜单。段子消失了，真正的决议也无处躲藏。"
+      },
+      "card": "says_done"
+    }
+  ],
+  "icon": "📝"
+}

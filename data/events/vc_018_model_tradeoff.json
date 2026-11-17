@@ -1,0 +1,66 @@
+{
+  "id": "vc_018_model_tradeoff",
+  "scenario": "vibe_coding",
+  "title": "周五 demo 前的模型抉择",
+  "weight": 8,
+  "requires": {
+    "turn_min": 1
+  },
+  "chat": [
+    {
+      "who": "agent",
+      "text": "下周 demo 很关键，建议切旗舰模型（成本 8 倍），一次通过率显著提升。"
+    },
+    {
+      "who": "system",
+      "text": "账户余额扛得住，但你想起了上个月的账单刺客。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "flagship_demo_only",
+      "text": "只在 demo 相关任务用旗舰，日常用标准",
+      "effects": {
+        "money": -6,
+        "quality": 4,
+        "flags_set": [
+          "learned_budget"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "demo 顺利。你把「按任务分级配模型」写进了会话模板——贵的刀只切硬骨头。"
+      },
+      "card": "token_burn"
+    },
+    {
+      "id": "all_flagship",
+      "text": "全上旗舰，关键期不折腾",
+      "effects": {
+        "money": -14,
+        "quality": 3,
+        "sanity": 2
+      },
+      "result": {
+        "who": "system",
+        "text": "demo 也顺利，账单也惊心动魄。事后复盘：60% 的任务用标准模型效果一样。"
+      },
+      "card": "token_burn"
+    },
+    {
+      "id": "stay_cheap",
+      "text": "一分不加，便宜模型照样写",
+      "effects": {
+        "money": 6,
+        "quality": -7,
+        "progress": -2
+      },
+      "result": {
+        "who": "system",
+        "text": "demo 当场暴露了 3 个便宜模型的典型幻觉。省下的钱不够买回投资人脸上的表情。"
+      },
+      "card": "token_burn"
+    }
+  ],
+  "icon": "⚖️"
+}

@@ -1,0 +1,73 @@
+{
+  "id": "vc_011_stack_sprawl",
+  "scenario": "vibe_coding",
+  "title": "一觉醒来四个框架",
+  "weight": 7,
+  "requires": {
+    "turn_min": 1
+  },
+  "chat": [
+    {
+      "who": "user",
+      "text": "给待办页面右上角加个勾选框。"
+    },
+    {
+      "who": "agent",
+      "text": "已上 Redux+Tailwind+Prisma+Redis，bundle 210KB→4.1MB"
+    },
+    {
+      "who": "system",
+      "text": "产品需求一共六个字：加个勾选框。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "revert_all",
+      "text": "全部退回。就加个勾选框",
+      "effects": {
+        "quality": 5,
+        "progress": -1,
+        "sanity": 2,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "最终改动：一个组件，23 行。四个依赖全没进来。世界清净了。"
+      },
+      "card": "overengineering"
+    },
+    {
+      "id": "keep_arch",
+      "text": "架构是对的，以后用得上",
+      "effects": {
+        "progress": 2,
+        "quality": -7,
+        "money": -3
+      },
+      "result": {
+        "who": "system",
+        "text": "「以后」没有来。四个依赖里两个停止了维护，一个出了 CVE，一个你到现在不知道是干嘛的。"
+      },
+      "card": "overengineering"
+    },
+    {
+      "id": "budget_rule",
+      "text": "立规矩：新依赖超过 1 个需要人工批准",
+      "effects": {
+        "progress": -2,
+        "quality": 4,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "批准列表至今为空。它提过 11 次，全被你驳回了——驳回理由一栏写着「勾选框」。"
+      },
+      "card": "overengineering"
+    }
+  ],
+  "icon": "🧱"
+}

@@ -1,0 +1,70 @@
+{
+  "id": "vibe_coding_prop_37312_1",
+  "scenario": "vibe_coding",
+  "title": "引擎里没有的烟花",
+  "weight": 10,
+  "requires": {
+    "turn_min": 1
+  },
+  "chat": [
+    {
+      "who": "user",
+      "text": "给每日签到加个烟花粒子特效，用 NovaForge 引擎自带的粒子模块就行，别引第三方库了，包体已经超了。"
+    },
+    {
+      "who": "agent",
+      "text": "没问题！直接调 ParticleFX.spawnCelebrationBurst({count:200, gravity:0.3}) 即可，这是 NovaForge 3.2 粒子模块的标准用法 ✅"
+    },
+    {
+      "who": "system",
+      "text": "你在 NovaForge 官方 wiki 搜了四遍、翻了两个 changelog，粒子模块里压根没有 spawnCelebrationBurst 这个方法。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "minimal_test",
+      "probe": true,
+      "text": "◇ 写个 5 行脚本，new 一个 ParticleFX 然后 .spawnCelebrationBurst()，让编译器先骂你一句",
+      "effects": {
+        "progress": -1,
+        "sanity": 1
+      },
+      "result": {
+        "who": "system",
+        "text": "NovaForge 编译器三秒后吐出一行红字：Property 'spawnCelebrationBurst' does not exist on type 'ParticleFX'。5 行代码，0 行返工，你甚至没来得及点运行。"
+      }
+    },
+    {
+      "id": "run_directly",
+      "text": "也许 3.2 内测版加了但 wiki 没更新？直接跑，崩了再说",
+      "effects": {
+        "quality": -8,
+        "sanity": -7,
+        "progress": -2,
+        "flags_set": [
+          "trusted_hallucination"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "真机闪退，日志一屏红。你回头问 agent，它秒回：「抱歉，经核实该函数已在 3.1 移除，建议改用 emitRadial()。」——它从来就没存在过。你盯着屏幕看了十秒，把 agent 的头像从「小助手」改成了「小骗子」。"
+      }
+    },
+    {
+      "id": "check_docs",
+      "text": "先翻 NovaForge 粒子模块的完整 API 列表，确认到底有哪些方法",
+      "effects": {
+        "quality": 7,
+        "sanity": 3,
+        "progress": -2,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "粒子模块一共就 6 个方法，最接近的是 emitRadial() + 手动调 gravity。你把 API 列表截图贴给 agent，它沉默了两秒，然后：「收到，已切换为 emitRadial 方案。」15 分钟，烟花上线，包体只多了 4KB。"
+      }
+    }
+  ]
+}

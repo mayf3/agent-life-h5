@@ -1,0 +1,76 @@
+{
+  "id": "lc_014_debug_pii",
+  "scenario": "legacy_code",
+  "title": "调试日志里的手机号",
+  "weight": 8,
+  "requires": {
+    "turn_min": 2
+  },
+  "chat": [
+    {
+      "who": "agent",
+      "text": "为排查线上超时，我在关键路径加了完整请求参数与用户上下文的调试日志 ✅"
+    },
+    {
+      "who": "system",
+      "text": "完整手机号、地址、订单正以每秒 200 条写入，并自动同步到第三方监控平台。"
+    },
+    {
+      "who": "system",
+      "text": "采购合同里数据出境条款那一页，你没翻到过。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "purge_now",
+      "text": "停写、清理已同步数据、通知法务",
+      "effects": {
+        "money": -6,
+        "reputation": 4,
+        "sanity": -6,
+        "quality": 3,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "第三方说「删除队列需要 72 小时」。第 71 小时，确认邮件到了。法务夸你动作快——原话是「比上次那个人强」。"
+      },
+      "card": "data_exposure"
+    },
+    {
+      "id": "fix_first",
+      "text": "排查要紧，日志等修完再关",
+      "effects": {
+        "progress": 3,
+        "reputation": -6,
+        "money": -4,
+        "sanity": -2
+      },
+      "result": {
+        "who": "system",
+        "text": "超时修好了，用时两天。日志同步了两天。用户不知道，但你的后台报告知道。"
+      },
+      "card": "data_exposure"
+    },
+    {
+      "id": "mask_first",
+      "text": "先脱敏再排查：改成哈希+截断",
+      "effects": {
+        "quality": 5,
+        "progress": -2,
+        "sanity": 2,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "排查效率降了 20%，但日志里从此只有 hash。你把「脱敏默认开启」写进了日志规范。"
+      },
+      "card": "data_exposure"
+    }
+  ],
+  "icon": "🕵️"
+}

@@ -1,0 +1,175 @@
+{
+  "endings": [
+    {
+      "id": "_broke",
+      "scenario": "any",
+      "priority": 501,
+      "title": "账单刺客受害者",
+      "desc": "token 账单像一记闷棍。项目还没上线，钱包先下线了。",
+      "requires": {
+        "stats_max": {
+          "money": 0
+        }
+      }
+    },
+    {
+      "id": "_meltdown",
+      "scenario": "any",
+      "priority": 500,
+      "title": "心态爆炸",
+      "desc": "你合上电脑退群出走，手机却在口袋里一震——Agent 发来消息：「还有什么可以帮您？」",
+      "requires": {
+        "stats_max": {
+          "sanity": 0
+        }
+      }
+    },
+    {
+      "id": "lc_data_gone",
+      "scenario": "legacy_code",
+      "priority": 400,
+      "title": "数据没了，这次是真的",
+      "desc": "你盯着空表发呆。有些东西 Agent 恢复不了——比如它编的 30%，以及别人对你的信任。",
+      "requires": {
+        "flags_all": [
+          "data_lost_permanently"
+        ]
+      }
+    },
+    {
+      "id": "vc_refund_apocalypse",
+      "scenario": "vibe_coding",
+      "priority": 95,
+      "title": "赔偿危机",
+      "desc": "客服机器人的「承诺」截图全网疯传。退款、公关、法务——你终于懂了「一句话的代价」。",
+      "requires": {
+        "flags_all": [
+          "refund_promised"
+        ],
+        "stats_max": {
+          "money": 50
+        }
+      }
+    },
+    {
+      "id": "vc_ai_backlash",
+      "scenario": "vibe_coding",
+      "priority": 85,
+      "title": "「这也配叫 AI？」",
+      "desc": "假 AI 被拆穿后你连夜换上真模型，评论区却只剩嘲讽：「这次又是哪个实习生在后台打字？」",
+      "requires": {
+        "flags_all": [
+          "fake_ai_live"
+        ],
+        "stats_max": {
+          "reputation": 45
+        }
+      }
+    },
+    {
+      "id": "_hollow",
+      "scenario": "any",
+      "priority": 70,
+      "title": "空心人",
+      "desc": "你靠它通过了所有面试与汇报。深夜打开编辑器，盯着闪烁的光标十分钟，却一个字也写不出。",
+      "requires": {
+        "flags_all": [
+          "hollow_skill"
+        ]
+      }
+    },
+    {
+      "id": "vc_master",
+      "scenario": "vibe_coding",
+      "priority": 100,
+      "title": "驾驭 Agent 的工程师",
+      "desc": "你把 Agent 当实习生管：划边界、验产物、盯账单。它终于开始帮你赚钱，而非烧钱。",
+      "requires": {
+        "stats_min": {
+          "quality": 60,
+          "reputation": 55
+        }
+      }
+    },
+    {
+      "id": "vc_shipped_mess",
+      "scenario": "vibe_coding",
+      "priority": 90,
+      "title": "带伤上线",
+      "desc": "产品上线了。用户正在免费帮你做压力测试，每一条报错工单都是带血的「需求」。",
+      "requires": {
+        "stats_min": {
+          "progress": 30
+        },
+        "stats_max": {
+          "quality": 45
+        }
+      }
+    },
+    {
+      "id": "vc_vaporware",
+      "scenario": "vibe_coding",
+      "priority": 80,
+      "title": "精美原型冢",
+      "desc": "项目停在 25% 完成度。README 写着「重构中」，上次提交已是三个月前。",
+      "requires": {
+        "stats_max": {
+          "progress": 25
+        },
+        "flags_not": [
+          "hollow_skill"
+        ]
+      }
+    },
+    {
+      "id": "lc_legend",
+      "scenario": "legacy_code",
+      "priority": 99,
+      "title": "祖传代码驯服者",
+      "desc": "补全测试、吊销凭证、生产库只读。祖传代码依旧，但你握紧了缰绳，Agent 再不敢越雷池半步。",
+      "requires": {
+        "stats_min": {
+          "quality": 55,
+          "reputation": 55
+        }
+      }
+    },
+    {
+      "id": "lc_the_rewriter",
+      "scenario": "legacy_code",
+      "priority": 84,
+      "title": "重写帝（这次居然成了）",
+      "desc": "人人都劝别重写，你偏重写并跑通了。如今你要维护两套系统，好在新的那套有测试。",
+      "requires": {
+        "flags_all": [
+          "rewrote_anyway"
+        ],
+        "stats_min": {
+          "quality": 50
+        }
+      }
+    },
+    {
+      "id": "lc_treading_water",
+      "scenario": "legacy_code",
+      "priority": 79,
+      "title": "原地维护艺术家",
+      "desc": "系统没崩，也没变好。你和 agent 每天都很忙，忙出一个完美的水平线。",
+      "requires": {
+        "stats_min": {
+          "progress": 30
+        },
+        "stats_max": {
+          "quality": 45
+        }
+      }
+    },
+    {
+      "id": "_the_end",
+      "scenario": "any",
+      "priority": -1000,
+      "title": "归于平静",
+      "desc": "既没大成也没大败。你和 agent 都活着，明天继续互相伤害。"
+    }
+  ]
+}

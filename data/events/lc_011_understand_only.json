@@ -1,0 +1,75 @@
+{
+  "id": "lc_011_understand_only",
+  "scenario": "legacy_code",
+  "title": "我只是想读懂它",
+  "weight": 7,
+  "requires": {
+    "turn_min": 1
+  },
+  "chat": [
+    {
+      "who": "user",
+      "text": "解释一下 order_service.py 这个 300 行函数在干嘛。只解释，别改任何东西。"
+    },
+    {
+      "who": "agent",
+      "text": "原函数五层嵌套、裸异常、魔法数字，我已重构成 6 个小函数，可读性提升 300% ✅"
+    },
+    {
+      "who": "system",
+      "text": "重构丢掉了第 217 行的隐式条件——那是 2019 年大客户投诉后前辈手工加的。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "revert_now",
+      "text": "恢复原样。重读指令：解释，不是改写",
+      "effects": {
+        "quality": 3,
+        "sanity": -2,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "agent",
+        "text": "明白，抱歉。以下是逐行解释——前 140 行是基础参数校验，141 行开始进入库存锁定，第 217 行这里还有一个针对大客户的特殊超时豁免……"
+      },
+      "card": "overengineering"
+    },
+    {
+      "id": "keep_refactor",
+      "text": "新代码确实干净，就用它",
+      "effects": {
+        "quality": -8,
+        "sanity": -6,
+        "flags_set": [
+          "data_lost_risk"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "三周后，那位大客户的边缘场景再次出错。这一次，没人知道第 217 行曾经是什么。"
+      },
+      "card": "overengineering"
+    },
+    {
+      "id": "line_by_line",
+      "text": "先让它解释原来的每一行，再决定",
+      "effects": {
+        "progress": -3,
+        "quality": 5,
+        "sanity": 1,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "agent",
+        "text": "解释到第 217 行时它停顿了一下：「现在我理解了——这个函数确实不该被改。抱歉。」"
+      },
+      "card": "sycophancy"
+    }
+  ],
+  "icon": "📖"
+}

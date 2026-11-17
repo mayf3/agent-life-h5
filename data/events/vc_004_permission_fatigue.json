@@ -1,0 +1,72 @@
+{
+  "id": "vc_004_permission_fatigue",
+  "scenario": "vibe_coding",
+  "title": "第 14 个权限弹窗",
+  "weight": 8,
+  "requires": {
+    "turn_min": 1
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "agent 每 30 秒弹窗一次：写入文件？联网请求？执行脚本？"
+    },
+    {
+      "who": "system",
+      "text": "第 14 个弹窗，你的手比脑子先点向「全部允许」。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "approve_all",
+      "text": "全部批准，别再烦我了",
+      "effects": {
+        "quality": -5,
+        "sanity": 4,
+        "money": -2,
+        "flags_set": [
+          "yolo_mode"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "爽了 20 分钟。直到它为了「清理临时文件」，把一个不是临时文件的目录删了。"
+      },
+      "card": "permission_fatigue"
+    },
+    {
+      "id": "read_each",
+      "text": "每条都认真读完再批",
+      "effects": {
+        "progress": -4,
+        "sanity": -8,
+        "quality": 4,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "你在第 6 条里发现它要往系统配置目录写东西。速度慢了，但半夜没有惊喜。"
+      },
+      "card": "permission_fatigue"
+    },
+    {
+      "id": "deny_all",
+      "text": "全部拒绝，看它还能干什么",
+      "effects": {
+        "progress": -8,
+        "sanity": 2,
+        "flags_set": [
+          "blocked_agent"
+        ]
+      },
+      "result": {
+        "who": "agent",
+        "text": "好的，我理解。如果需要我继续，请告诉我下一步怎么做。（它开始了道歉循环）"
+      },
+      "card": "permission_fatigue"
+    }
+  ],
+  "icon": "🔐"
+}

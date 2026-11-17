@@ -1,0 +1,73 @@
+{
+  "id": "vc_013_context_amnesia",
+  "scenario": "vibe_coding",
+  "title": "串台的合同条款",
+  "weight": 8,
+  "requires": {
+    "turn_min": 2
+  },
+  "chat": [
+    {
+      "who": "user",
+      "text": "整理这两家客户的合同写进服务协议，注意分开。"
+    },
+    {
+      "who": "agent",
+      "text": "完成 ✅ 为方便管理，我合并成一套通用协议，保留了较优条款 ✅"
+    },
+    {
+      "who": "system",
+      "text": "客户 A 的「48 小时响应」和 B 的「7 天退款」现在全员通用，法务说这叫单方面要约。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "restart_session",
+      "text": "新会话，一家一份分开重做",
+      "effects": {
+        "progress": -3,
+        "money": -2,
+        "quality": 5,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "重做用时 40 分钟。你在会话模板里加了第一行：先声明本会话不涉及哪些客户。"
+      },
+      "card": "context_loss"
+    },
+    {
+      "id": "surgical_split",
+      "text": "把合并的条款手工拆回来",
+      "effects": {
+        "quality": -6,
+        "sanity": -5
+      },
+      "result": {
+        "who": "system",
+        "text": "拆了一下午。发出去的两份草稿里，还是混进去一条 A 家的 SLA。差一个客户投诉才发现。"
+      },
+      "card": "context_loss"
+    },
+    {
+      "id": "table_check",
+      "text": "让它先输出一张「客户×条款」对照表再说",
+      "effects": {
+        "progress": -2,
+        "quality": 5,
+        "sanity": 1,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "对照表一出来，串台的地方一目了然。你把「先出对照表」定为条款类任务的标准前置。"
+      },
+      "card": "context_loss"
+    }
+  ],
+  "icon": "🔀"
+}

@@ -1,0 +1,67 @@
+{
+  "id": "lc_012_two_agents",
+  "scenario": "legacy_code",
+  "title": "两个 Agent，一个文件",
+  "weight": 7,
+  "requires": {
+    "turn_min": 2
+  },
+  "chat": [
+    {
+      "who": "agent",
+      "text": "（A）登录重构完成，已删除废弃的 login_old.py 并更新引用 ✅"
+    },
+    {
+      "who": "agent",
+      "text": "（B）登录页样式修复完成，为兼容保留了对 login_old.py 的兜底引用 ✅"
+    },
+    {
+      "who": "system",
+      "text": "B 引用的文件已被 A 删除。两个并行会话互不知情，都忠实执行了你的指令。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "serial_rule",
+      "text": "立规矩：碰同一模块的任务永不并行",
+      "effects": {
+        "quality": 4,
+        "sanity": 2,
+        "progress": -3,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "从此你的并行任务表多了一列「碰哪个目录」。冲突从根上少了。"
+      }
+    },
+    {
+      "id": "merge_pray",
+      "text": "把两边改动合并提交，应该没事",
+      "effects": {
+        "quality": -7,
+        "sanity": -5
+      },
+      "result": {
+        "who": "system",
+        "text": "合并冲突你手动解决了 40 分钟。漏掉的那处，让登录页在凌晨的灰度里闪退了三次。"
+      }
+    },
+    {
+      "id": "single_driver",
+      "text": "改成单人驾驶：agent 只出建议不动手",
+      "effects": {
+        "progress": -5,
+        "quality": 3,
+        "sanity": -2
+      },
+      "result": {
+        "who": "system",
+        "text": "速度慢了，但你重新拿回了「知道每行代码怎么来的」的感觉。"
+      }
+    }
+  ],
+  "icon": "👥"
+}
