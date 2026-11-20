@@ -275,5 +275,41 @@
       <div id="notice" role="status" aria-live="polite"></div>
     </div>
     <script src="app.js?v=34fca1f05676" defer></script>
-  </body>
+  
+<script>
+// 自动选择操控方式（v0.8 设备适配）：强特征自动直进，模糊设备交给用户。
+// 手选记忆：用户真实点击（isTrusted）时保存偏好，下次直接进入。
+(function () {
+  function pick(action) {
+    var btn = document.querySelector('.control-choice[data-action="' + action + '"]');
+    if (btn) btn.click();
+  }
+  function detect() {
+    var ua = navigator.userAgent;
+    var touch = (navigator.maxTouchPoints || 0) > 1 && ("ontouchstart" in window);
+    var small = Math.min(screen.width, screen.height) <= 600;
+    if (/Android|iPhone|iPad|Mobile|HarmonyOS/i.test(ua) && touch) return "chooseTouch";
+    if (!touch && !small) return "chooseKeyboard";
+    return ""; // 触屏笔电等模糊设备：留给用户手选
+  }
+  // 记住用户的手动选择（真实点击才计入）
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest(".control-choice");
+    if (b && e.isTrusted) {
+      try { localStorage.setItem("lingxu-controls", b.dataset.action || ""); } catch (err) {}
+    }
+  });
+  document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(function () {
+      var saved = "";
+      try { saved = localStorage.getItem("lingxu-controls") || ""; } catch (err) {}
+      if (saved === "chooseTouch") { pick("chooseTouch"); return; }
+      if (saved === "chooseKeyboard") { pick("chooseKeyboard"); return; }
+      var detected = detect();
+      if (detected) pick(detected);
+    }, 500);
+  });
+})();
+</script>
+</body>
 </html>
