@@ -76,6 +76,7 @@ function scrollBottom() {
 }
 
 function buildMsg(who, text) {
+  text = text == null ? '' : String(text);
   const meta = WHO_BADGE[who] || WHO_BADGE.system;
   const row = el("div", "msg " + meta.cls);
   row.append(el("div", "badge " + meta.cls, meta.face));
@@ -115,6 +116,7 @@ async function playMessages(msgs) {
 }
 
 function buildMsgStatic(who, text) {
+  text = text == null ? '' : String(text);
   const meta = WHO_BADGE[who] || WHO_BADGE.system;
   const row = el("div", "msg " + meta.cls);
   row.append(el("div", "badge " + meta.cls, meta.face));
