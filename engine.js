@@ -94,7 +94,7 @@ async function typeText(span, text, cursor) {
     if (skipType) { span.textContent = text; break; }
     span.textContent += text[i];
     scrollBottom();
-    await sleep(18);
+    await sleep(6);
   }
   cursor.remove();
   scrollBottom();
@@ -107,9 +107,9 @@ async function playMessages(msgs) {
     const node = buildMsg(who, text);
     chat.append(node.row);
     scrollBottom();
-    await sleep(300);
+    await sleep(220);
     await typeText(node.span, text, node.cursor);
-    await sleep(200);
+    await sleep(150);
   }
   scrollBottom();
 }
@@ -470,7 +470,7 @@ function startRun(scenarioId) {
     </div>
     <div class="chat" id="chat"></div>
     <div class="choices" id="choices"></div>`;
-  $("#chat").addEventListener("click", () => { skipType = true; });
+  $("#chat").addEventListener("click", () => { skipType = true; });  // 点击=跳过本事件剩余对白（下事件自动恢复逐字）
   renderEvent();
 }
 
