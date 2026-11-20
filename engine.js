@@ -113,6 +113,7 @@ async function playMessages(msgs) {
     if (skipType) { chat.append(buildMsgStatic(who, text)); continue; }
     const node = buildMsg(who, text);
     chat.append(node.row);
+    sanitizeChat();
     scrollBottom();
     await sleep(220);
     await typeText(node.span, text, node.cursor);
@@ -249,6 +250,7 @@ function onChoice(choiceId, btnEl) {
     $("#chat").append(buildMsgStatic(outcome.result.who, outcome.result.text));
   }
   showDeltas(outcome.deltas);
+  sanitizeChat();
   sanitizeChat();
   renderTop(st, new Set(Object.keys(outcome.deltas)), lastStats);
   lastStats = { ...st.stats };
