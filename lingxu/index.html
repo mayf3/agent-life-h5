@@ -1,40 +1,279 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>凌虚 · 御剑凌云</title>
-<style>
-body{font-family:"PingFang SC",sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  min-height:100vh;margin:0;background:#192e2c;color:#fff;text-align:center}
-h1{font-size:34px;font-weight:700;margin:0 0 8px}
-p{color:#9fb8b5;margin:0 0 28px;font-size:14px}
-button{font-size:16px;padding:14px 34px;margin:6px;border-radius:12px;border:1px solid #3f5a57;
-  background:#223c39;color:#e8f2f1;cursor:pointer;transition:transform .15s,background .15s}
-button:hover{background:#2c4a47;transform:translateY(-1px)}
-button.primary{background:#a74130;border-color:#a74130;color:#fff0d6;font-weight:700}
-.small{font-size:12px;color:#6d8784;margin-top:20px}
-</style>
-</head>
-<body>
-<h1>凌虚 · 御剑凌云</h1>
-<p>正在为你选择合适的版本……</p>
-<button class="primary" onclick="location.href='mobile/'">📱 手机版</button>
-<button onclick="location.href='desktop/'">🖥️ 桌面版</button>
-<div class="small">通常无需手动选择——页面会自动跳转</div>
-<script>
-(function(){
-  var isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-  var isSmall = Math.min(screen.width, screen.height) <= 500;
-  var isMobileUA = /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
-  if (isMobileUA || (isTouchDevice && isSmall)) {
-    document.querySelector('p').textContent = '检测到移动设备，正在进入手机版……';
-    setTimeout(function(){ location.replace('mobile/'); }, 600);
-  } else {
-    document.querySelector('p').textContent = '桌面环境，正在进入完整版……';
-    setTimeout(function(){ location.replace('desktop/'); }, 600);
-  }
-})();
-</script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#192e2c" />
+    <title>凌虚 · 御剑凌云</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23a74130'/%3E%3Cpath d='m5 23 11-17 1 13 9-6-2 10' stroke='%23fff0d6' fill='none' stroke-width='2'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="style.css?v=5e4fa3620514" />
+  </head>
+  <body>
+    <div id="game" data-screen="home">
+      <div class="art" aria-hidden="true"></div>
+      <div class="art-shade"></div>
+      <canvas id="atmosphere" aria-hidden="true"></canvas>
+      <div id="viewport"></div>
+      <header>
+        <button class="brand" data-action="home" aria-label="凌虚，返回山境">
+          <span class="brand-symbol"
+            ><svg viewBox="0 0 40 40" fill="none">
+              <path
+                d="M5 30 21 7l-3 15 8-8-3 10 11-8-6 13-8 3 3-8-10 8 4-12Z"
+                fill="currentColor"
+              /></svg></span
+          ><span class="brand-name">凌虚</span><span class="brand-line"></span
+          ><span class="brand-en">SWORD<br />FLIGHT</span>
+        </button>
+        <nav aria-label="主导航">
+          <button class="active" data-action="home">山境大厅</button
+          ><button data-action="guide">御剑心法</button
+          ><button data-action="records">修行记录</button>
+        </nav>
+        <div class="utilities">
+          <button
+            class="icon-btn"
+            id="touch-help"
+            data-action="guide"
+            title="触屏操作"
+            aria-label="触屏操作指南"
+          >
+            <i data-icon="help"></i>
+          </button>
+          <button
+            class="icon-btn"
+            id="audioButton"
+            data-action="sound"
+            title="开启声音"
+            aria-label="开启声音"
+          ></button
+          ><button
+            class="icon-btn full-btn"
+            data-action="fullscreen"
+            title="全屏"
+            aria-label="全屏"
+          >
+            <i data-icon="expand"></i></button
+          ><button
+            class="icon-btn play-only"
+            data-action="pause"
+            title="暂停"
+            aria-label="暂停"
+          >
+            <i data-icon="pause"></i>
+          </button>
+        </div>
+      </header>
+      <main id="home">
+        <section class="intro">
+          <div class="chapter">
+            <span class="chapter-rule"></span>山境壹
+            <span class="divider-dot">/</span> 青岚群峰
+          </div>
+          <h1>御剑凌云</h1>
+          <div class="english-title">
+            <span></span>SWORD FLIGHT<span class="diamond"></span>
+          </div>
+          <p>
+            从青石起剑台踏上飞剑，借灵力滑行升空。<br />循着云海中的八重灵环，穿越青岚群峰。
+          </p>
+          <div class="launch-actions">
+            <button class="primary" data-action="trial">
+              <i data-icon="sword"></i>开始试炼
+              <span class="enter-key">↵</span></button
+            ><button class="secondary" data-action="free">
+              <i data-icon="wind"></i>自由御剑
+            </button>
+          </div>
+        </section>
+        <button
+          class="chart-card"
+          data-action="map"
+          aria-label="查看青岚山境航线图"
+        >
+          <span class="card-eyebrow"
+            ><span class="gold-line"></span>山境舆图
+            <span class="card-expand"><i data-icon="diagonal"></i></span
+          ></span>
+          <canvas
+            id="map-small"
+            width="560"
+            height="224"
+            aria-hidden="true"
+          ></canvas>
+          <span class="chart-bottom"
+            ><span><b>青岚环线</b><small>QINGLAN CIRCUIT</small></span
+            ><span class="ring-count"
+              ><i data-icon="ring"></i>八重灵环</span
+            ></span
+          >
+        </button>
+      </main>
+      <footer id="home-footer">
+        <span class="footer-label"><i data-icon="keyboard"></i> 基础操控</span
+        ><span class="shortcut"><kbd>W</kbd><kbd>S</kbd>升降</span
+        ><span class="shortcut"><kbd>A</kbd><kbd>D</kbd>转向</span
+        ><span class="shortcut"><kbd>Shift</kbd>聚气加速</span
+        ><span class="shortcut"><kbd>Space</kbd>收势减速</span
+        ><span class="footer-links"
+          ><button data-action="chooseControls" class="input-settings">
+            <i data-icon="controls"></i>操作方式</button
+          ><button data-action="guide" class="footer-help">
+            <i data-icon="book"></i>操作指南
+          </button></span
+        >
+      </footer>
+      <section id="hud" aria-label="飞行仪表">
+        <div class="objective hudbox">
+          <div class="hud-kicker">
+            <span class="live-dot"></span><span id="mode-label">穿环试炼</span>
+          </div>
+          <h2 id="gate-title"></h2>
+          <div id="gate-sub"></div>
+          <div id="gate-dots"></div>
+        </div>
+        <div id="compass" aria-label="航向"></div>
+        <div class="direction" id="direction"></div>
+        <div id="live-message" role="status"></div>
+        <aside class="meridians instrument" aria-label="灵力周天">
+          <div class="instrument-heading">
+            <span class="instrument-glyph">◈</span><b>灵力周天</b
+            ><span class="reading-tag" id="qi-state">静息</span>
+          </div>
+          <canvas
+            id="meridians"
+            width="210"
+            height="145"
+            aria-label="人物经脉与灵力流向"
+          ></canvas>
+          <div class="qiline">
+            <span>丹田</span>
+            <div><em id="qibar"></em></div>
+            <strong id="qival">100</strong>
+          </div>
+        </aside>
+        <div class="telemetry instrument">
+          <div class="instrument-heading">
+            <i data-icon="wind"></i><b>实时剑速</b
+            ><span id="drive-state" class="reading-tag">停剑</span>
+          </div>
+          <div class="speed-value"><b id="speed">0</b><span>km/h</span></div>
+          <div class="speed-track"><div id="speed-fill"></div></div>
+          <div class="speed-scale">
+            <span>0</span><span>60</span><span>120</span>
+          </div>
+          <div class="flight-readings">
+            <span>海拔 <b id="altitude">65</b> m</span
+            ><span id="motion-readout">静止</span>
+          </div>
+          <div id="pump-meter"></div>
+        </div>
+        <aside class="live-map instrument" aria-label="神识探知雷达">
+          <div class="instrument-heading">
+            <span class="instrument-glyph">⌖</span><b>神识探知</b
+            ><span class="reading-tag">120 m</span>
+          </div>
+          <canvas
+            id="map-live"
+            width="210"
+            height="150"
+            aria-label="以剑首为正前方的附近目标"
+          ></canvas>
+          <div id="map-caption">◇ 灵环　△ 峰　⌂ 楼阁</div>
+        </aside>
+        <div class="launch-lesson" id="launch-lesson" hidden>
+          <button id="launch-control" type="button" aria-label="地面起剑操作">
+            <span class="lesson-key" id="lesson-key">W</span>
+            <span class="lesson-action" id="lesson-action">走近飞剑</span
+            ><span class="press-hint" id="press-hint">按住</span>
+            <span class="action-track" aria-hidden="true"
+              ><i id="action-fill"></i
+            ></span>
+          </button>
+        </div>
+        <div class="touch-controls">
+          <div
+            class="touch-pad"
+            aria-label="左拇指摇杆，上推爬升，下拉俯冲，左右转向"
+          >
+            <div class="stick-ring">
+              <i class="pad-north">升</i><i class="pad-south">降</i
+              ><i class="pad-west">左</i><i class="pad-east">右</i
+              ><span class="stick-thumb"></span>
+            </div>
+            <span class="pad-name">御剑</span>
+          </div>
+          <div class="touch-actions" aria-label="右拇指操控">
+            <button
+              class="pump-btn"
+              data-hold="pump"
+              aria-label="按住屈膝，回平时松开"
+            >
+              <i data-icon="spring"></i><b>屈膝</b>
+            </button>
+            <button
+              class="brake-btn"
+              data-hold="brake"
+              aria-label="按住收势减速"
+            >
+              <i data-icon="brake"></i><b>收势</b>
+            </button>
+            <button
+              class="boost-btn"
+              data-hold="boost"
+              aria-label="轻点切换持续聚气，按住临时加速"
+            >
+              <i data-icon="wind"></i><b>聚气</b>
+            </button>
+          </div>
+        </div>
+        <div class="flight-keys">
+          <span><kbd>W S</kbd>升降</span><span><kbd>A D</kbd>压刃</span
+          ><span><kbd>Shift</kbd>聚气</span><span><kbd>Space</kbd>收势</span
+          ><span><kbd>E</kbd>屈膝</span
+          ><button data-action="recover"><kbd>R</kbd>归位</button
+          ><button data-action="pause"><kbd>Esc</kbd>暂停</button>
+        </div>
+      </section>
+      <div id="overlay">
+        <section
+          id="dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="dialog-title"
+          tabindex="-1"
+          data-kind="input-choice"
+        >
+          <div class="modal-kicker">FLIGHT CONTROLS</div>
+          <h2 id="dialog-title">选择操作方式</h2>
+          <div class="input-choices">
+            <button
+              type="button"
+              class="control-choice"
+              data-action="chooseTouch"
+            >
+              <i class="choice-icon" data-icon="phone"></i
+              ><strong>手机触屏</strong><small>屏幕摇杆 · 双拇指操控</small>
+            </button>
+            <button
+              type="button"
+              class="control-choice"
+              data-action="chooseKeyboard"
+            >
+              <i class="choice-icon" data-icon="keyboard"></i
+              ><strong>电脑键鼠</strong><small>WASD 驾驶 · Shift 加速</small>
+            </button>
+          </div>
+        </section>
+      </div>
+      <div id="notice" role="status" aria-live="polite"></div>
+    </div>
+    <script src="app.js?v=34fca1f05676" defer></script>
+  </body>
 </html>

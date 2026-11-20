@@ -1,0 +1,2037 @@
+@font-face {
+  font-family: Brush;
+  src: url("assets/brush.ttf");
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#game {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+body {
+  background: #172e31;
+  color: #fbf6e9;
+  font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+button {
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  border: 0;
+  background: none;
+  touch-action: manipulation;
+}
+button:focus-visible {
+  outline: 2px solid #ffe4a1;
+  outline-offset: 4px;
+}
+i[data-icon] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+svg.icon {
+  width: 1.2em;
+  height: 1.2em;
+  display: block;
+  stroke: currentColor;
+  stroke-width: 1.55;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.art,
+.art-shade,
+#atmosphere,
+#viewport {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.art {
+  background: url("assets/qinglan.webp") center center/cover no-repeat;
+}
+.art-shade {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(14, 26, 27, 0.45),
+      transparent 18%,
+      transparent 56%,
+      rgba(9, 24, 26, 0.39) 82%,
+      rgba(7, 20, 23, 0.84)
+    ),
+    linear-gradient(
+      90deg,
+      rgba(8, 22, 26, 0.55) 0%,
+      rgba(12, 31, 34, 0.27) 29%,
+      transparent 54%
+    );
+}
+#atmosphere {
+  pointer-events: none;
+}
+#viewport {
+  display: none;
+}
+#viewport canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  padding: 0 clamp(24px, 4.5vw, 84px);
+  height: 90px;
+  gap: 30px;
+  background: linear-gradient(180deg, #0e1f2433, transparent);
+}
+header:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 4.5%;
+  right: 4.5%;
+  height: 1px;
+  background: linear-gradient(90deg, #fff6de40, #fff6de27 70%, #fff6de40);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  white-space: nowrap;
+}
+.brand-symbol {
+  display: grid;
+  place-items: center;
+  width: 39px;
+  height: 39px;
+  border: 1px solid #edb79f80;
+  border-radius: 3px;
+  background: #a34434;
+  box-shadow:
+    inset 0 0 0 3px #9d3d2d,
+    inset 0 0 0 4px #e5b49b79;
+  color: #f9e3c9;
+}
+.brand-symbol svg {
+  width: 95%;
+}
+.brand-name {
+  font-family: Brush, "Xingkai SC", serif;
+  font-size: 39px;
+  letter-spacing: 2px;
+}
+.brand-line {
+  height: 22px;
+  width: 1px;
+  background: #f2e7d18c;
+  margin: 0 3px;
+}
+.brand-en {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 10px;
+  letter-spacing: 2.1px;
+  text-align: left;
+  line-height: 1.45;
+}
+.utilities {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+}
+.icon-btn {
+  width: 39px;
+  height: 39px;
+  border: 1px solid #f4ecd35c;
+  border-radius: 50%;
+  background: #172a2b27;
+  display: grid;
+  place-items: center;
+}
+.icon-btn:hover,
+.secondary:hover {
+  background: #1537378a;
+  border-color: #fbe7c7;
+}
+.icon-btn svg {
+  width: 17px;
+  height: 17px;
+}
+nav {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  align-self: stretch;
+  display: flex;
+  gap: clamp(18px, 3.1vw, 60px);
+}
+nav button {
+  position: relative;
+  white-space: nowrap;
+  padding: 0 3px;
+  opacity: 0.78;
+  font:
+    16px "Songti SC",
+    SimSun,
+    serif;
+  letter-spacing: 2px;
+  text-shadow: 0 1px 8px #203836;
+}
+nav button:hover,
+nav button.active {
+  opacity: 1;
+}
+nav button.active:after {
+  content: "";
+  position: absolute;
+  width: 32px;
+  height: 2px;
+  background: #f1d0a4;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+nav button.active:before {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  bottom: 13px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  background: #f4d3ad;
+}
+#home {
+  position: absolute;
+  inset: 90px 0 83px;
+  pointer-events: none;
+}
+#home button {
+  pointer-events: auto;
+}
+.intro {
+  position: absolute;
+  left: 5.25%;
+  bottom: clamp(42px, 9.2vh, 130px);
+  max-width: 65%;
+}
+.chapter,
+.card-eyebrow,
+.hud-kicker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #e5ceb0;
+  font-size: 13px;
+  letter-spacing: 3px;
+}
+.chapter {
+  font-family: "Songti SC", SimSun, serif;
+  font-weight: 600;
+  font-size: 15px;
+  text-shadow: 0 1px 7px #162e2d;
+}
+.chapter-rule,
+.gold-line {
+  display: block;
+  height: 1px;
+  width: 34px;
+  background: currentColor;
+  position: relative;
+}
+.chapter-rule:after {
+  content: "";
+  position: absolute;
+  right: -2px;
+  top: -2px;
+  width: 5px;
+  height: 5px;
+  background: currentColor;
+  transform: rotate(45deg);
+}
+.divider-dot {
+  opacity: 0.6;
+  font-size: 11px;
+}
+.intro h1 {
+  font:
+    normal clamp(76px, 8.2vw, 152px) / 1.18 Brush,
+    "Xingkai SC",
+    "Kaiti SC",
+    serif;
+  letter-spacing: 0.025em;
+  margin: 13px 0 2px -0.04em;
+  text-shadow: 0 2px 19px #0f302b45;
+  color: #fff8e8;
+}
+.english-title {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  color: #edd7b2;
+  letter-spacing: 0.43em;
+  font:
+    14px Georgia,
+    serif;
+  letter-spacing: 0.43em;
+}
+.english-title > span:first-child {
+  height: 1px;
+  width: 25px;
+  background: #e7cb9e;
+}
+.diamond {
+  transform: rotate(45deg);
+  width: 4px;
+  height: 4px;
+  background: #d8bd99;
+}
+.intro p {
+  color: #fbf5e6eb;
+  font-size: 16px;
+  letter-spacing: 1.5px;
+  line-height: 1.95;
+  margin: 25px 0 30px;
+  text-shadow: 0 1px 9px #152d2a;
+}
+.launch-actions {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 51px;
+  padding: 0 24px;
+  font:
+    600 17px "Songti SC",
+    "STSong",
+    SimSun,
+    serif;
+  letter-spacing: 2px;
+  border-radius: 3px;
+  transition:
+    background 0.18s,
+    transform 0.18s;
+}
+.primary {
+  background: #ae4938;
+  border: 1px solid #d58a68;
+  box-shadow:
+    inset 0 0 0 3px #ac4836,
+    inset 0 0 0 4px #d17a58aa,
+    0 5px 20px #17201a29;
+  color: #fff6df;
+}
+.primary:hover {
+  background: #bd5441;
+  transform: translateY(-1px);
+}
+.primary > i,
+.secondary > i {
+  font-size: 20px;
+}
+.enter-key {
+  font:
+    14px Georgia,
+    serif;
+  border: 1px solid #f9d2b26b;
+  line-height: 17px;
+  padding: 0 4px;
+  opacity: 0.8;
+  margin-left: 4px;
+}
+.secondary {
+  border: 1px solid #d9d4bd82;
+  background: #172d2f59;
+  backdrop-filter: blur(8px);
+  color: #fff7e7;
+}
+.chart-card,
+.hudbox {
+  background: linear-gradient(120deg, #192b2bf2, #233530dc);
+  backdrop-filter: blur(11px);
+  border: 1px solid #ccbd956e;
+  box-shadow: 0 7px 30px #0b201936;
+}
+.chart-card {
+  position: absolute;
+  right: 4.6%;
+  bottom: 39px;
+  width: clamp(207px, 17.4vw, 290px);
+  border-radius: 3px;
+  text-align: left;
+  padding: 15px 17px 14px;
+  color: #ebdfc5;
+  transition:
+    transform 0.18s,
+    border-color 0.18s;
+}
+.chart-card:hover {
+  transform: translateY(-3px);
+  border-color: #cfb787;
+}
+.card-eyebrow {
+  font-size: 12px;
+  gap: 8px;
+  letter-spacing: 2px;
+}
+.gold-line {
+  width: 16px;
+}
+.card-expand {
+  margin-left: auto;
+  font-size: 13px;
+}
+.chart-card canvas {
+  display: block;
+  width: 100%;
+  height: clamp(65px, 8vh, 105px);
+  margin: 6px 0 7px;
+}
+.chart-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #d7c8a234;
+  padding-top: 11px;
+}
+.chart-bottom b {
+  display: block;
+  font:
+    600 17px "Songti SC",
+    SimSun,
+    serif;
+  letter-spacing: 2px;
+}
+.chart-bottom small {
+  display: block;
+  margin-top: 4px;
+  font:
+    8px Georgia,
+    serif;
+  letter-spacing: 1.9px;
+  color: #a9b6a5;
+}
+.ring-count {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  font-size: 11px;
+  color: #dbc9a8;
+}
+footer {
+  position: absolute;
+  bottom: 0;
+  left: 4.5%;
+  right: 4.5%;
+  height: 77px;
+  border-top: 1px solid #ede7c643;
+  display: flex;
+  align-items: center;
+  gap: clamp(13px, 2vw, 32px);
+  font-size: 13px;
+  color: #ede8d9;
+}
+.footer-label,
+.footer-help,
+.shortcut,
+.flight-keys span,
+.flight-keys button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.footer-label {
+  color: #d7c5a5;
+  gap: 8px;
+  margin-right: 4px;
+}
+.footer-help {
+  margin-left: auto;
+  gap: 8px;
+  color: #e3d5b9;
+  padding: 10px 0;
+}
+.shortcut {
+  gap: 5px;
+}
+kbd {
+  font:
+    11px/20px ui-monospace,
+    monospace;
+  background: #1d2c2e55;
+  border: 1px solid #c5c6b078;
+  border-radius: 3px;
+  padding: 0 5px;
+  min-width: 20px;
+  text-align: center;
+  color: #f3eddb;
+  letter-spacing: 0;
+}
+.shortcut kbd:last-of-type {
+  margin-right: 3px;
+}
+#hud,
+.play-only {
+  display: none;
+}
+[data-screen="fly"] #viewport,
+[data-screen="fly"] #hud {
+  display: block;
+}
+[data-screen="fly"] .play-only {
+  display: grid;
+}
+[data-screen="fly"] .art,
+[data-screen="fly"] .art-shade,
+[data-screen="fly"] #atmosphere,
+[data-screen="fly"] #home,
+[data-screen="fly"] #home-footer,
+[data-screen="fly"] nav {
+  display: none;
+}
+[data-screen="fly"] header {
+  height: 68px;
+  pointer-events: none;
+  background: linear-gradient(#182c327a, transparent);
+}
+[data-screen="fly"] header > * {
+  pointer-events: auto;
+}
+[data-screen="fly"] header:after {
+  display: none;
+}
+[data-screen="fly"] .brand-symbol {
+  width: 30px;
+  height: 30px;
+}
+[data-screen="fly"] .brand-name {
+  font-size: 31px;
+}
+[data-screen="fly"] .brand-en {
+  font-size: 8px;
+}
+#hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+#hud button,
+#hud .touch-pad {
+  pointer-events: auto;
+}
+.hudbox {
+  border-radius: 3px;
+}
+.objective,
+.telemetry,
+.live-map {
+  position: absolute;
+  padding: 15px 19px;
+}
+.objective {
+  top: 85px;
+  left: 4.5%;
+  min-width: 185px;
+}
+.hud-kicker {
+  font-size: 12px;
+  letter-spacing: 2px;
+  gap: 6px;
+}
+.live-dot {
+  width: 5px;
+  height: 5px;
+  transform: rotate(45deg);
+  background: #b9e4ce;
+}
+.objective h2 {
+  font:
+    23px "Songti SC",
+    serif;
+  margin: 7px 0;
+}
+.objective #gate-sub,
+.live-map #map-caption {
+  font-size: 12px;
+  color: #ddddca;
+}
+.objective #gate-dots {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+.gate-dot {
+  width: 7px;
+  height: 7px;
+  border: 1px solid #d6c5a1;
+  transform: rotate(45deg);
+}
+.gate-dot.done {
+  background: #aedad0;
+}
+.gate-dot.next {
+  background: #e3a566;
+}
+.telemetry {
+  bottom: 70px;
+  left: 4.5%;
+  width: 220px;
+}
+.meters {
+  display: flex;
+  gap: 22px;
+  margin: 8px 0;
+}
+.meters b {
+  font:
+    30px Georgia,
+    serif;
+  font-variant-numeric: tabular-nums;
+}
+.meters small,
+.meters label {
+  font-size: 11px;
+  color: #e0d6c2;
+}
+.meters label {
+  display: block;
+}
+.qiline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #badeca;
+}
+.qiline > div {
+  flex: 1;
+  height: 4px;
+  background: #677c70;
+}
+.qiline em {
+  display: block;
+  background: #bbdfbd;
+  height: 100%;
+}
+.live-map {
+  bottom: 70px;
+  right: 4.5%;
+  width: 177px;
+  text-align: center;
+  padding: 7px;
+}
+.live-map canvas {
+  width: 100%;
+  height: auto;
+}
+.live-map #map-caption {
+  border-top: 1px solid #d0c49a36;
+  padding: 5px;
+}
+.flight-keys {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  white-space: nowrap;
+  align-items: center;
+  gap: 16px;
+  border-radius: 3px;
+  padding: 7px 12px;
+  background: #162a2bd6;
+  color: #ebe3c9;
+  font-size: 12px;
+}
+.flight-keys button {
+  padding: 0;
+}
+.flight-keys kbd {
+  line-height: 17px;
+}
+.direction {
+  position: absolute;
+  top: 22%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 13px;
+  color: white;
+  background: #233936cc;
+  border: 1px solid #dcc49c80;
+  border-radius: 18px;
+  padding: 5px 12px;
+  white-space: nowrap;
+}
+.direction:empty {
+  display: none;
+}
+#compass {
+  position: absolute;
+  top: 23px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff8e5;
+  text-shadow: 0 1px 4px #27333b;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 3px;
+}
+#live-message {
+  position: absolute;
+  bottom: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  font:
+    21px "Songti SC",
+    serif;
+  text-align: center;
+  text-shadow: 0 1px 6px #123738;
+  background: #1e3637b5;
+  border-radius: 3px;
+  padding: 10px 20px;
+}
+#live-message:empty {
+  display: none;
+}
+#overlay {
+  position: absolute;
+  inset: 0;
+  background: #10201fc2;
+  z-index: 9;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  backdrop-filter: blur(7px);
+}
+#overlay[hidden] {
+  display: none;
+}
+#dialog {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: 90dvh;
+  overflow: auto;
+  background: linear-gradient(145deg, #243c39, #192b2c);
+  border: 1px solid #afa17d99;
+  border-radius: 4px;
+  padding: 32px 35px;
+  box-shadow: 0 20px 90px #0913136b;
+}
+#dialog h2 {
+  font:
+    normal 33px "Songti SC",
+    SimSun,
+    serif;
+  letter-spacing: 3px;
+  margin: 6px 0 18px;
+  color: #fff1d7;
+}
+#dialog h3 {
+  font:
+    600 17px "Songti SC",
+    SimSun,
+    serif;
+  margin: 17px 0 5px;
+  color: #f0debc;
+}
+#dialog p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #d4ddd3;
+  margin: 10px 0;
+}
+.modal-close {
+  position: absolute;
+  right: 16px;
+  top: 15px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #d4c4a159;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+.tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid #cdbd9944;
+  margin: 0 0 14px;
+}
+.tabs button {
+  font-size: 14px;
+  padding: 9px 10px;
+}
+.tabs .selected {
+  color: #f2d2a3;
+  border-bottom: 2px solid #d49c6c;
+}
+.guide-row,
+.record-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 0;
+  border-bottom: 1px solid #a5b1a022;
+  gap: 10px;
+  font-size: 14px;
+  color: #eee6d4;
+}
+.guide-row small {
+  color: #c3cbbd;
+}
+.guide-row kbd {
+  font-size: 12px;
+  white-space: nowrap;
+}
+.modal-actions {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+.modal-actions .primary,
+.modal-actions .secondary {
+  font-size: 15px;
+  min-height: 43px;
+  padding: 0 16px;
+}
+.modal-kicker {
+  font:
+    11px Georgia,
+    serif;
+  color: #c8b18c;
+  letter-spacing: 3px;
+}
+.map-big {
+  display: block;
+  width: 100%;
+  height: 220px;
+  border: 1px solid #ccb88a42;
+  margin: 12px 0;
+}
+.record-row b {
+  font:
+    18px Georgia,
+    serif;
+}
+.record-row small {
+  font-size: 12px;
+  color: #c4c7b7;
+}
+.model-math {
+  color: #efd0a4;
+  font:
+    15px Georgia,
+    serif;
+}
+.touch-controls {
+  display: none;
+}
+#notice {
+  position: absolute;
+  bottom: 14%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #233634ef;
+  border-radius: 4px;
+  color: #f3eadb;
+  font-size: 14px;
+  padding: 10px 15px;
+  z-index: 12;
+  pointer-events: none;
+}
+#notice:empty {
+  display: none;
+}
+@media (min-aspect-ratio: 21/10) {
+  .intro {
+    bottom: 7%;
+  }
+  .intro h1 {
+    font-size: 13vh;
+  }
+  .intro p {
+    margin: 12px 0 17px;
+  }
+  .chart-card {
+    bottom: 5%;
+  }
+}
+@media (max-width: 900px) {
+  nav {
+    gap: 16px;
+    left: 53%;
+  }
+  .chart-card {
+    right: 4%;
+    width: 195px;
+  }
+  .brand-en,
+  .brand-line {
+    display: none;
+  }
+  footer {
+    gap: 13px;
+  }
+  .footer-label {
+    display: none;
+  }
+  .intro h1 {
+    font-size: clamp(74px, 10vw, 96px);
+  }
+}
+@media (max-width: 620px) {
+  header {
+    height: 69px;
+    padding: 0 5%;
+    gap: 12px;
+  }
+  .brand-name {
+    font-size: 32px;
+  }
+  .brand-symbol {
+    width: 31px;
+    height: 31px;
+  }
+  .brand {
+    gap: 7px;
+  }
+  nav {
+    position: static;
+    transform: none;
+    margin-left: auto;
+    gap: 12px;
+  }
+  nav button {
+    font-size: 13px;
+    letter-spacing: 0.4px;
+  }
+  nav button:first-child {
+    display: none;
+  }
+  .utilities {
+    margin: 0;
+    gap: 6px;
+  }
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+  }
+  .full-btn {
+    display: none;
+  }
+  #home {
+    inset: 69px 0 54px;
+  }
+  .art {
+    background-position: 62% center;
+  }
+  .art-shade {
+    background: linear-gradient(
+      180deg,
+      #13272860,
+      transparent 20%,
+      transparent 36%,
+      #10252388 59%,
+      #0a2021f0 94%
+    );
+  }
+  .intro {
+    left: 6%;
+    bottom: 5%;
+    max-width: 92%;
+  }
+  .chapter {
+    font-size: 13px;
+  }
+  .intro h1 {
+    font-size: clamp(64px, 15vw, 87px);
+    margin: 8px 0;
+  }
+  .english-title {
+    font-size: 11px;
+  }
+  .intro p {
+    font-size: 14px;
+    line-height: 1.75;
+    margin: 14px 0 17px;
+  }
+  .launch-actions {
+    gap: 10px;
+  }
+  .primary,
+  .secondary {
+    font-size: 16px;
+    min-height: 46px;
+    padding: 0 16px;
+  }
+  .chart-card {
+    top: 18px;
+    right: 5%;
+    bottom: auto;
+    width: 125px;
+    padding: 9px 10px;
+  }
+  .chart-card canvas {
+    height: 40px;
+    margin: 4px 0;
+  }
+  .card-eyebrow {
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+  .chart-bottom {
+    padding: 6px 0 0;
+  }
+  .chart-bottom b {
+    font-size: 13px;
+  }
+  .chart-bottom small,
+  .ring-count {
+    display: none;
+  }
+  footer {
+    height: 48px;
+    left: 6%;
+    right: 6%;
+  }
+  .shortcut {
+    display: none;
+  }
+  .footer-label {
+    display: flex;
+  }
+  .objective {
+    top: 65px;
+    left: 4%;
+    min-width: 140px;
+    padding: 10px;
+  }
+  .objective h2 {
+    font-size: 17px;
+  }
+  #compass {
+    display: none;
+  }
+  .telemetry {
+    width: 150px;
+    left: 4%;
+    bottom: 145px;
+    padding: 10px;
+  }
+  .live-map {
+    width: 111px;
+    right: 4%;
+    bottom: 145px;
+  }
+  .meters b {
+    font-size: 22px;
+  }
+  .flight-keys {
+    display: none;
+  }
+  #dialog {
+    padding: 25px 21px;
+  }
+  .guide-row small {
+    font-size: 11px;
+  }
+  .map-big {
+    height: 155px;
+  }
+}
+@media (max-height: 570px) and (min-width: 621px) {
+  header {
+    height: 55px;
+  }
+  #home {
+    top: 55px;
+    bottom: 40px;
+  }
+  .intro {
+    bottom: 8%;
+  }
+  .intro h1 {
+    font-size: 60px;
+  }
+  .intro p {
+    font-size: 13px;
+    margin: 10px 0 13px;
+  }
+  .chapter {
+    font-size: 12px;
+  }
+  .english-title {
+    font-size: 10px;
+  }
+  .primary,
+  .secondary {
+    min-height: 39px;
+    font-size: 14px;
+  }
+  .chart-card {
+    bottom: 15px;
+  }
+  .chart-card canvas {
+    height: 47px;
+  }
+  footer {
+    height: 40px;
+  }
+  .objective {
+    top: 58px;
+  }
+  .touch-pad {
+    width: 75px;
+    height: 75px;
+  }
+  .telemetry,
+  .live-map {
+    bottom: 84px;
+  }
+  .live-map {
+    width: 115px;
+  }
+  .telemetry {
+    width: 165px;
+  }
+  .flight-keys {
+    bottom: 5px;
+  }
+  .meters b {
+    font-size: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 620px) {
+  #live-message {
+    bottom: 32%;
+    width: max-content;
+    max-width: 65%;
+    font-size: 15px;
+  }
+}
+
+#pump-meter {
+  font-size: 12px;
+  color: #efca8e;
+  letter-spacing: 1px;
+}
+#pump-meter:not(:empty) {
+  margin-top: 8px;
+}
+
+/* The two right-hand instruments leave the sword and its runway in view. */
+.instrument {
+  position: absolute;
+  --rim: #bfbd955f;
+  color: #f4ecd3;
+  border: 1px solid var(--rim);
+  border-radius: 4px;
+  background: linear-gradient(
+    120deg,
+    rgba(18, 38, 35, 0.94),
+    rgba(21, 40, 37, 0.86)
+  );
+  box-shadow: 0 5px 18px #071b1b25;
+  padding: 11px 13px;
+}
+.instrument-heading {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  line-height: 1.3;
+  color: #dfcaa1;
+}
+.instrument-heading b {
+  font:
+    600 15px "Songti SC",
+    "STSong",
+    serif;
+  letter-spacing: 1.5px;
+}
+.instrument-glyph {
+  font-size: 17px;
+}
+.reading-tag {
+  margin-left: auto;
+  font-size: 11px;
+  color: #a9d6c6;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+.meridians {
+  top: 78px;
+  right: 3.1%;
+  width: clamp(157px, 14.3vw, 211px);
+}
+.meridians canvas,
+.live-map canvas {
+  display: block;
+  width: 100%;
+  height: 112px;
+}
+.meridians .qiline {
+  padding-top: 5px;
+  border-top: 1px solid #c8bd8b38;
+  line-height: 1.5;
+}
+.live-map.instrument {
+  width: clamp(150px, 13.5vw, 195px);
+  right: 3.1%;
+  bottom: 67px;
+  text-align: left;
+}
+.live-map canvas {
+  height: 116px;
+}
+.live-map #map-caption {
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  color: #cfdbc5;
+  padding: 4px 0 0;
+  text-align: center;
+  white-space: nowrap;
+}
+.telemetry.instrument {
+  left: 3.1%;
+  bottom: 67px;
+  width: clamp(180px, 16.5vw, 240px);
+  padding: 13px 16px;
+}
+.speed-value {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  line-height: 1;
+  margin: 7px 0 6px;
+}
+.speed-value b {
+  font-family:
+    ui-sans-serif, "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 550;
+  font-size: clamp(42px, 4.15vw, 65px);
+  letter-spacing: -0.065em;
+  font-variant-numeric: tabular-nums;
+  color: #fff5d8;
+}
+.speed-value span {
+  font:
+    15px Georgia,
+    serif;
+  color: #d4c49e;
+}
+.speed-track {
+  height: 5px;
+  background: repeating-linear-gradient(
+    90deg,
+    #40554b 0 calc(8.333% - 2px),
+    transparent calc(8.333% - 2px) 8.333%
+  );
+  overflow: hidden;
+}
+.speed-track div {
+  height: 100%;
+  width: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    #9fdfc2 0 calc(8.333% - 2px),
+    transparent calc(8.333% - 2px) 8.333%
+  );
+  background-size: var(--scale-width, 190px) 100%;
+}
+.speed-scale {
+  display: flex;
+  justify-content: space-between;
+  font:
+    9px ui-monospace,
+    monospace;
+  color: #b9c7b6;
+  margin: 2px 0 6px;
+}
+.flight-readings {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #c8bd8b38;
+  padding-top: 6px;
+  font-size: 12px;
+  color: #d4ddcf;
+}
+.flight-readings b {
+  font:
+    normal 14px ui-monospace,
+    monospace;
+  color: #f9ecd2;
+}
+#motion-readout {
+  color: #afd9c6;
+  font-size: 11px;
+}
+#hud[data-thrust="high"] .speed-value b,
+#hud[data-thrust="high"] #drive-state {
+  color: #ffd798;
+}
+#hud[data-thrust="high"] .telemetry {
+  border-color: #e6b2729c;
+}
+.launch-lesson {
+  position: absolute;
+  bottom: 71px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 45%;
+  pointer-events: auto;
+}
+.launch-lesson[hidden] {
+  display: none;
+}
+#launch-control {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 200px;
+  min-height: 52px;
+  padding: 9px 18px;
+  color: #fcf0d4;
+  background: linear-gradient(120deg, #27423def, #253f39f5);
+  border: 1px solid #c7af7c;
+  border-radius: 3px;
+  box-shadow: 0 4px 14px #091c2140;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+#launch-control:active,
+#launch-control[data-held="true"] {
+  background: #37564a;
+}
+.lesson-key {
+  border: 1px solid #d9c69bb0;
+  background: #ead8a91c;
+  padding: 3px 6px;
+  border-radius: 3px;
+  font:
+    14px ui-monospace,
+    monospace;
+  min-width: 24px;
+}
+.lesson-action {
+  font:
+    600 17px "Songti SC",
+    serif;
+  letter-spacing: 1px;
+}
+.press-hint {
+  font-size: 11px;
+  color: #ceceb7;
+}
+.action-track {
+  height: 3px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.action-track i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: #e7c286;
+}
+#hud[data-launch="true"] .flight-keys span {
+  display: none;
+}
+#hud[data-launch="true"] #direction,
+#hud[data-launch="true"] #live-message {
+  display: none;
+}
+#hud[data-launch="true"] .objective #gate-sub {
+  max-width: 220px;
+  line-height: 1.65;
+}
+#hud[data-launch="true"] .objective #gate-dots {
+  gap: 5px;
+  margin-top: 10px;
+}
+.launch-step {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #718177;
+}
+.launch-step.done {
+  background: #afcdb1;
+}
+.launch-step.current {
+  background: #e8bc7e;
+}
+@media (max-width: 740px) {
+  .telemetry.instrument {
+    width: 150px;
+    left: 3%;
+    padding: 9px 11px;
+  }
+  .meridians {
+    right: 3%;
+    width: 139px;
+    padding: 8px 10px;
+  }
+  .meridians canvas {
+    height: 92px;
+  }
+  .live-map.instrument {
+    width: 132px;
+    right: 3%;
+    padding: 8px 10px;
+  }
+  .live-map canvas {
+    height: 91px;
+  }
+  .instrument-heading b {
+    font-size: 13px;
+    letter-spacing: 0.8px;
+  }
+  .speed-value b {
+    font-size: 40px;
+  }
+  #hud[data-launch="true"] .objective {
+    min-width: 0;
+    max-width: 44%;
+  }
+  #hud[data-launch="true"] .objective #gate-sub {
+    font-size: 12px;
+  }
+  .launch-lesson {
+    bottom: 48px;
+  }
+  #launch-control {
+    min-width: 162px;
+    min-height: 43px;
+    padding: 7px 10px;
+    gap: 6px;
+  }
+  .lesson-action {
+    font-size: 15px;
+  }
+}
+@media (max-width: 620px) {
+  [data-screen="fly"] .utilities {
+    margin-left: auto;
+  }
+  .meridians {
+    top: 66px;
+    width: 112px;
+    padding: 6px 8px;
+  }
+  .meridians canvas {
+    height: 85px;
+  }
+  .live-map.instrument {
+    width: 113px;
+    bottom: 133px;
+    padding: 7px;
+  }
+  .live-map canvas {
+    height: 77px;
+  }
+  .telemetry.instrument {
+    width: 139px;
+    bottom: 133px;
+  }
+  .speed-value b {
+    font-size: 37px;
+  }
+  .speed-scale {
+    margin-bottom: 3px;
+  }
+  .flight-readings {
+    font-size: 11px;
+  }
+  .reading-tag {
+    font-size: 10px;
+  }
+  .instrument-heading {
+    gap: 3px;
+  }
+  .instrument-glyph {
+    font-size: 12px;
+  }
+  .launch-lesson {
+    max-width: 80%;
+    bottom: 32px;
+  }
+  #hud[data-launch="true"] .telemetry,
+  #hud[data-launch="true"] .live-map {
+    bottom: 105px;
+  }
+  #hud[data-launch="true"] .touch-controls {
+    display: none;
+  }
+  .objective {
+    left: 3%;
+    max-width: 50%;
+    min-width: 0;
+  }
+  .objective #gate-sub {
+    line-height: 1.5;
+  }
+  .direction {
+    top: 36%;
+  }
+  #hud[data-launch="true"] .flight-keys {
+    display: none;
+  }
+}
+@media (max-height: 540px) and (min-width: 621px) {
+  .meridians {
+    top: 55px;
+    width: 139px;
+    padding: 5px 8px;
+  }
+  .meridians canvas {
+    height: 74px;
+  }
+  .live-map.instrument {
+    width: 134px;
+    bottom: 40px;
+    padding: 5px 8px;
+  }
+  .live-map canvas {
+    height: 63px;
+  }
+  .telemetry.instrument {
+    width: 163px;
+    bottom: 40px;
+    padding: 7px 10px;
+  }
+  .speed-value b {
+    font-size: 35px;
+  }
+  .launch-lesson {
+    bottom: 41px;
+  }
+  .instrument-heading b {
+    font-size: 13px;
+  }
+  .objective {
+    max-width: 205px;
+    padding: 8px 12px;
+  }
+}
+.instrument-heading b {
+  white-space: nowrap;
+}
+@media (max-width: 620px) {
+  .live-map.instrument {
+    width: 132px;
+  }
+  .live-map #map-caption {
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+}
+#speed-fill {
+  background: #9fdfc2;
+}
+.speed-track {
+  background: #40554b;
+  mask-image: repeating-linear-gradient(
+    90deg,
+    #000 0 calc(8.333% - 2px),
+    transparent calc(8.333% - 2px) 8.333%
+  );
+}
+#hud[data-thrust="high"] #speed-fill {
+  background: #e6bb7f;
+}
+
+#touch-help {display:none}
+.touch-manual h3{margin:14px 0 3px}.touch-manual p{margin:3px 0 10px!important}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 1.6vw, 24px);
+  margin-left: auto;
+}
+.footer-links button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  margin: 0;
+  padding: 2px 0;
+  color: #e7dcc6;
+  white-space: nowrap;
+}
+.footer-links button:hover { color: #fff3d7; }
+
+#dialog[data-kind="input-choice"] {
+  width: min(530px, 100%);
+  padding: clamp(22px, 4vw, 34px);
+  border-color: #c9b17caa;
+  background:
+    radial-gradient(ellipse at 15% 0, #46605470, transparent 70%),
+    linear-gradient(145deg, #213a34, #172c2b);
+}
+#dialog[data-kind="input-choice"] h2 {
+  margin: 7px 0 22px;
+  font-size: clamp(25px, 4vw, 33px);
+}
+.input-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.control-choice {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 8px;
+  min-width: 0;
+  min-height: 124px;
+  padding: 17px 18px;
+  border: 1px solid #a0ad906b;
+  border-radius: 4px;
+  background: linear-gradient(115deg, #3f554482, #324a3c6b);
+  color: #fff2d4;
+  text-align: left;
+  touch-action: manipulation;
+}
+.control-choice .choice-icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: #e7cfa2;
+}
+.choice-icon svg { width: 24px; height: 24px; }
+.control-choice strong {
+  font: 600 20px/1.3 "Songti SC", SimSun, serif;
+  letter-spacing: 1px;
+}
+.control-choice small { font-size: 13px; line-height: 1.5; color: #ccd9c8; }
+.control-choice.chosen { border-color: #dbbc85; }
+@media (hover: hover) {
+  .control-choice:hover {
+    border-color: #d3bc89;
+    background: linear-gradient(115deg, #51654d, #344a3e);
+  }
+}
+.control-choice:active { background: #435d4a; }
+.control-choice:focus-visible { outline: 2px solid #ffe4a1; outline-offset: 3px; }
+@media (max-width: 460px) {
+  .input-choices { grid-template-columns: 1fr; gap: 10px; }
+  .control-choice {
+    grid-template-columns: 36px minmax(0, 1fr);
+    align-content: center;
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 2px;
+    min-height: 80px;
+    padding: 13px 15px;
+  }
+  .control-choice .choice-icon { grid-column: 1; grid-row: 1/3; }
+  .control-choice strong, .control-choice small { grid-column: 2; }
+}
+@media (max-height: 420px) and (orientation: landscape) {
+  #dialog[data-kind="input-choice"] { padding: 18px 23px; }
+  #dialog[data-kind="input-choice"] h2 { font-size: 25px; margin: 4px 0 12px; }
+  .control-choice { min-height: 92px; gap: 4px; padding: 9px 15px; }
+}
+/* Even a narrow device can be used with an external keyboard. */
+@media (max-width: 620px) {
+  #game[data-touch="false"] #hud .flight-keys {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 3px 9px;
+    width: max-content;
+    max-width: calc(100% - 20px);
+    padding: 5px 8px;
+    bottom: max(6px, env(safe-area-inset-bottom));
+    font-size: 11px;
+  }
+  #game[data-touch="false"] .telemetry.instrument,
+  #game[data-touch="false"] .live-map.instrument { bottom: 77px; }
+  #game[data-touch="false"] #hud[data-launch="true"] .telemetry,
+  #game[data-touch="false"] #hud[data-launch="true"] .live-map { bottom: 111px; }
+  #game[data-touch="false"] .launch-lesson { bottom: 42px; }
+}
+
+/* Touch HUD. Anchor controls to visible device edges, including the home indicator. */
+#touch-help { display: none; }
+#game[data-touch="true"] {
+  --edge-left: max(env(safe-area-inset-left, 0px), clamp(9px, 2.4vw, 26px));
+  --edge-right: max(env(safe-area-inset-right, 0px), clamp(9px, 2.4vw, 26px));
+  --edge-top: max(env(safe-area-inset-top, 0px), 3px);
+  --edge-bottom: max(env(safe-area-inset-bottom, 0px), 8px);
+  --touch-header: 49px;
+  --sensor-width: clamp(119px, 26vw, 151px);
+  --stick-size: clamp(102px, 29vw, 124px);
+  --stick-zone: clamp(135px, 40vw, 171px);
+  --stick-zone-height: calc(var(--stick-size) + 28px);
+  --action-d: clamp(48px, 13.6vw, 58px);
+  --boost-d: calc(var(--action-d) + 12px);
+  --cluster-width: calc(var(--action-d) + var(--boost-d) + 7px);
+}
+#game[data-touch="true"][data-screen="fly"] {
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  -webkit-tap-highlight-color: transparent;
+}
+#game[data-touch="true"][data-screen="fly"] #viewport,
+#game[data-touch="true"][data-screen="fly"] #viewport canvas {
+  touch-action: none;
+}
+#game[data-touch="true"][data-screen="fly"] header {
+  height: calc(var(--touch-header) + var(--edge-top));
+  padding: var(--edge-top) var(--edge-right) 0 var(--edge-left);
+  gap: 9px;
+}
+#game[data-touch="true"][data-screen="fly"] .brand {
+  min-height: 44px;
+}
+#game[data-touch="true"][data-screen="fly"] .utilities {
+  align-items: center;
+  margin-left: auto;
+  gap: 0;
+}
+/* A 44px tap target encloses the compact control itself. */
+#game[data-touch="true"][data-screen="fly"] .utilities .icon-btn {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  isolation: isolate;
+}
+#game[data-touch="true"][data-screen="fly"] .utilities .icon-btn::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 6px;
+  border-radius: 50%;
+  border: 1px solid #f4eac382;
+  background: #1733307d;
+}
+#game[data-touch="true"][data-screen="fly"] .utilities .full-btn { display: none; }
+#game[data-touch="true"][data-screen="fly"] #touch-help {
+  display: grid;
+  place-items: center;
+  font: 600 19px Georgia, serif;
+}
+#game[data-touch="true"][data-screen="fly"] #hud {
+  display: grid;
+  grid-template-columns: minmax(0, clamp(143px, 41vw, 204px)) 1fr var(--sensor-width);
+  grid-auto-rows: min-content;
+  align-content: start;
+  align-items: start;
+  gap: 6px;
+  padding: calc(var(--edge-top) + var(--touch-header) + 4px) var(--edge-right) 0 var(--edge-left);
+}
+#game[data-touch="true"] #hud :is(.objective, .telemetry, .meridians, .live-map) {
+  position: static;
+  min-width: 0;
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  border-radius: 5px;
+  border: 1px solid #c4c9ac5c;
+  box-shadow: 0 2px 10px #0c252517;
+  background: linear-gradient(125deg,#102a27e8,#263e37db);
+}
+#game[data-touch="true"] #hud .objective {
+  grid-column: 1;
+  grid-row: 1;
+  padding: 8px 10px;
+  align-self: start;
+}
+#game[data-touch="true"] .objective .hud-kicker {
+  gap: 5px;
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: .6px;
+}
+#game[data-touch="true"] .objective h2 {
+  font-size: 18px;
+  line-height: 1.25;
+  margin: 4px 0 3px;
+}
+#game[data-touch="true"] #hud .objective #gate-sub {
+  max-width: none;
+  line-height: 1.45;
+  font-size: 12px;
+  text-wrap: pretty;
+}
+#game[data-touch="true"] #hud .objective #gate-dots { gap: 4px; margin-top: 6px; }
+#game[data-touch="true"] #hud .objective #gate-dots:empty { margin: 0; }
+#game[data-touch="true"] #hud .telemetry {
+  grid-column: 1;
+  grid-row: 2;
+  max-width: 160px;
+  padding: 6px 9px 7px;
+}
+#game[data-touch="true"] .telemetry .instrument-heading,
+#game[data-touch="true"] .instrument-heading { gap: 4px; }
+#game[data-touch="true"] .instrument-heading b { font-size: 13px; letter-spacing: .4px; white-space: nowrap; }
+#game[data-touch="true"] .instrument .reading-tag { font-size: 10px; letter-spacing: 0; }
+#game[data-touch="true"] .telemetry .speed-value { margin: 4px 0; gap: 6px; }
+#game[data-touch="true"] .telemetry .speed-value b { font-size: 36px; line-height: .96; }
+#game[data-touch="true"] .telemetry .speed-value span { font-size: 13px; }
+#game[data-touch="true"] .telemetry .speed-track { height: 3px; }
+#game[data-touch="true"] .telemetry .speed-scale { display: none; }
+#game[data-touch="true"] .telemetry .flight-readings { gap: 3px; padding-top: 4px; margin-top: 4px; font-size: 10px; line-height: 1.2; border: 0; }
+#game[data-touch="true"] .telemetry .flight-readings b { font-size: 12px; }
+#game[data-touch="true"] .telemetry #motion-readout { font-size: 10px; }
+#game[data-touch="true"] #pump-meter:not(:empty) { margin-top: 4px; font-size: 11px; }
+#game[data-touch="true"] #hud .meridians { grid-column: 3; grid-row: 1; padding: 6px 7px; }
+#game[data-touch="true"] #hud .live-map { grid-column: 3; grid-row: 2; padding: 6px 7px; }
+#game[data-touch="true"] .meridians .instrument-glyph,
+#game[data-touch="true"] .live-map .instrument-glyph { display: none; }
+#game[data-touch="true"] .meridians canvas { height: clamp(66px, 9dvh, 102px); }
+#game[data-touch="true"] .live-map canvas { height: clamp(63px, 8.9dvh, 99px); }
+#game[data-touch="true"] .meridians .qiline { gap: 4px; padding-top: 2px; font-size: 10px; border: 0; line-height: 1.15;}
+#game[data-touch="true"] .live-map #map-caption { padding: 2px 0 0; font-size: 9px; letter-spacing: 0; border: 0; }
+#game[data-touch="true"] #hud .direction {
+  position: static;
+  grid-column: 1;
+  grid-row: 3;
+  justify-self: start;
+  transform: none;
+  max-width: 100%;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+}
+#game[data-touch="true"] #compass, #game[data-touch="true"] #hud .flight-keys { display: none; }
+#game[data-touch="true"] #live-message {
+  bottom: calc(var(--edge-bottom) + var(--stick-zone-height) + 10px);
+  max-width: 75vw;
+  width: max-content;
+  font-size: 14px;
+  padding: 7px 11px;
+  white-space: normal;
+}
+#game[data-touch="true"] #hud .launch-lesson {
+  bottom: calc(var(--edge-bottom) + 16px);
+  right: calc(var(--edge-right) + 5px);
+  left: auto;
+  width: max-content;
+  max-width: 50%;
+  transform: none;
+}
+#game[data-touch="true"] #hud #launch-control {
+  padding: 9px 18px 11px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 3px;
+  min-width: clamp(124px, 38vw, 163px);
+  min-height: 61px;
+  background: linear-gradient(135deg,#254a3ff2,#163830f5);
+  border: 1px solid #dcc393be;
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 3px #f8efbb0c, 0 3px 14px #09252336;
+  touch-action: none;
+}
+#game[data-touch="true"] #launch-control .lesson-action { font-size: 17px; line-height: 1.3; }
+#game[data-touch="true"] #launch-control .press-hint { color: #d6d8bd; line-height: 1.2; font-size: 11px; }
+#game[data-touch="true"] #launch-control .lesson-key { display: none; }
+#game[data-touch="true"] #hud #launch-control:is(:active,[data-held="true"],[data-assisted="true"]) {
+  border-color: #ffe1a4; background: #426047f3;
+}
+#game[data-touch="true"] #hud .touch-controls {
+  position: absolute;
+  inset: auto var(--edge-right) var(--edge-bottom) var(--edge-left);
+  width: auto;
+  height: var(--stick-zone-height);
+  padding: 0;
+  margin: 0;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+#game[data-touch="true"] #hud[data-launch="true"] .touch-controls { display: none; }
+#game[data-touch="true"] #hud:is([data-phase="runway"],[data-phase="liftoff"]) .touch-controls { display: block; }
+#game[data-touch="true"] #hud[data-launch="true"] .touch-actions { display: none; }
+#game[data-touch="true"] .touch-pad {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: block;
+  width: var(--stick-zone);
+  height: var(--stick-zone-height);
+  background: transparent;
+  border: 0;
+  border-radius: 12px;
+  pointer-events: auto;
+  touch-action: none;
+}
+#game[data-touch="true"] .touch-pad .stick-ring {
+  position: absolute;
+  left: calc(50% + var(--stick-base-x,0px));
+  top: calc(50% + var(--stick-base-y,0px));
+  transform: translate(-50%,-50%);
+  display: grid;
+  place-items: center;
+  width: var(--stick-size);
+  height: var(--stick-size);
+  border: 1px solid #e6d4aab0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle closest-side, #1a302f39 32%,transparent 33%,transparent 69%,#e1d7b529 70%,transparent 72%),
+    linear-gradient(135deg,#244139aa, #162f2da8);
+  box-shadow: inset 0 0 0 4px #f2edcd0c, 0 3px 14px #0d262721;
+  pointer-events: none;
+}
+#game[data-touch="true"] .touch-pad .stick-thumb {
+  display:block; width:37%; height:37%; position:relative;
+  background: radial-gradient(ellipse at 38% 28%,#86a397f5,#47695eeb);
+  border: 1px solid #e5dbb5b5;
+  box-shadow: inset 0 0 0 3px #f2edcd14, 0 2px 5px #122f2b80;
+  border-radius: 50%;
+  pointer-events: none;
+}
+#game[data-touch="true"] .touch-pad[data-active="true"] .stick-thumb { background: #789c85f5; border-color:#f5e1b2; }
+#game[data-touch="true"] .stick-ring :is(.pad-north,.pad-south,.pad-west,.pad-east) {
+  position: absolute;
+  font-size: 11px;
+  line-height: 1;
+  font-style: normal;
+  color: #fff4d5;
+  text-shadow: 0 1px 3px #132825;
+  pointer-events: none;
+}
+#game[data-touch="true"] .pad-north { top: 8px; left: 50%; transform: translateX(-50%); }
+#game[data-touch="true"] .pad-south { bottom: 8px; left: 50%; transform: translateX(-50%); }
+#game[data-touch="true"] .pad-west { left: 8px; top: 50%; transform: translateY(-50%); }
+#game[data-touch="true"] .pad-east { right: 8px; top: 50%; transform: translateY(-50%); }
+#game[data-touch="true"] .touch-pad .pad-name { display:none; }
+#game[data-touch="true"] .touch-actions {
+  position: absolute;
+  right: 4px;
+  bottom: 8px;
+  display: block;
+  width: var(--cluster-width);
+  height: calc(var(--action-d) * 2 + 8px);
+  pointer-events: none;
+}
+#game[data-touch="true"] .touch-actions button {
+  position:absolute; width:var(--action-d); height:var(--action-d); min-width:44px; min-height:44px;
+  display:flex; flex-direction:column; justify-content:center; align-items:center; gap:3px;
+  padding:2px; border-radius:50%; border:1px solid #d7c69caa;
+  color:#f7edcf; background:linear-gradient(145deg,#2b4743ef,#193330f0);
+  box-shadow:inset 0 0 0 3px #e0d8ac0d,0 3px 12px #10242228;
+  touch-action:none; pointer-events:auto; line-height:1.05;
+}
+#game[data-touch="true"] .touch-actions button b { font-size:12px; font-weight:550; letter-spacing:.3px; }
+#game[data-touch="true"] .touch-actions button svg { width:16px; height:16px; }
+#game[data-touch="true"] .touch-actions .brake-btn { top:0; left:0; }
+#game[data-touch="true"] .touch-actions .pump-btn { bottom:0; left:0; }
+#game[data-touch="true"] .touch-actions .boost-btn {
+  top:50%; right:0; transform:translateY(-50%);
+  width:var(--boost-d);height:var(--boost-d);
+  color:#fff1cb;border-color:#e4cd98;
+  background:linear-gradient(140deg,#52664bef,#304a3aef);
+}
+#game[data-touch="true"] .touch-actions .boost-btn svg { width:21px; height:21px; }
+#game[data-touch="true"] .touch-actions .boost-btn b { font-size:14px; }
+#game[data-touch="true"] .touch-actions button:is(:active,[data-pressed="true"],[data-latched="true"]) {
+  color:#fff3c9;border-color:#ffe6a7;background:linear-gradient(135deg,#817151f5,#496749f5);
+  box-shadow:inset 0 0 0 3px #f6e5b333,0 0 14px #b4d89566;
+}
+#game[data-touch="true"] .touch-actions .boost-btn[data-latched="true"]::before {
+  content:""; position:absolute; top:5px; right:5px; width:6px; height:6px;
+  border:1px solid #ffedc7; border-radius:50%; background:#f5cd77;
+}
+@media (orientation:landscape) and (max-height:600px) {
+  #game[data-touch="true"] {
+    --touch-header:42px;
+    --sensor-width:clamp(93px,14vw,119px);
+    --stick-size:clamp(85px,25dvh,110px);
+    --stick-zone:clamp(128px,22vw,168px);
+    --stick-zone-height:calc(var(--stick-size) + 21px);
+    --action-d:clamp(44px,12.5dvh,53px);
+  }
+  #game[data-touch="true"][data-screen="fly"] #hud {
+    grid-template-columns:clamp(125px,20vw,180px) clamp(90px,14vw,126px) minmax(2px,1fr) var(--sensor-width) var(--sensor-width);
+    gap:5px;
+    padding-top:calc(var(--edge-top) + var(--touch-header) + 1px);
+  }
+  #game[data-touch="true"] #hud .telemetry {grid-column:2;grid-row:1;}
+  #game[data-touch="true"] #hud .meridians {grid-column:4;grid-row:1;}
+  #game[data-touch="true"] #hud .live-map {grid-column:5;grid-row:1;}
+  #game[data-touch="true"] #hud .direction {grid-column:1/3;grid-row:2;}
+  #game[data-touch="true"] #hud .objective {padding:6px 8px;}
+  #game[data-touch="true"] .objective h2 {font-size:16px;margin:3px 0 2px;}
+  #game[data-touch="true"] #hud .objective #gate-sub {font-size:11px;}
+  #game[data-touch="true"] #hud .objective #gate-dots {margin-top:4px;}
+  #game[data-touch="true"] #hud :is(.telemetry,.meridians,.live-map){padding:5px 6px;}
+  #game[data-touch="true"] .instrument .instrument-heading b{font-size:12px;letter-spacing:0;}
+  #game[data-touch="true"] .telemetry .instrument-heading i{display:none;}
+  #game[data-touch="true"] .instrument .reading-tag {font-size:9px;}
+  #game[data-touch="true"] .telemetry .flight-readings {display:block;}
+  #game[data-touch="true"] .telemetry #motion-readout{display:none;}
+  #game[data-touch="true"] .telemetry .speed-value b{font-size:31px;}
+  #game[data-touch="true"] .live-map canvas,#game[data-touch="true"] .meridians canvas {height:clamp(47px,15dvh,74px);}
+  #game[data-touch="true"] #map-caption {overflow:hidden;}
+  #game[data-touch="true"] .live-map #map-caption {font-size:8px;}
+  #game[data-touch="true"] .touch-actions {bottom:2px;}
+}
+@media (max-width:359px) and (orientation:portrait) {
+  #game[data-touch="true"] {--sensor-width:106px;}
+  #game[data-touch="true"] .instrument .instrument-heading b {font-size:12px;letter-spacing:0;}
+  #game[data-touch="true"] .instrument .reading-tag {font-size:9px;}
+}
+@media (orientation: portrait) {
+  /* Before the first push the left thumb zone is free. Keep the rider's face visible. */
+  #game[data-touch="true"] #hud:is([data-phase="ground"],[data-phase="mounting"],[data-phase="ready"]) .telemetry {
+    position: absolute;
+    top: auto;
+    left: calc(var(--edge-left) + 3px);
+    bottom: calc(var(--edge-bottom) + 16px);
+    width: clamp(116px, 33vw, 154px);
+    padding: 7px 9px;
+  }
+}
+#game[data-touch="true"] :is(.enter-key, .shortcut, .footer-label) { display: none; }
