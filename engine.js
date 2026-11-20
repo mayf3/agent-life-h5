@@ -101,6 +101,12 @@ async function typeText(span, text, cursor) {
   scrollBottom();
 }
 
+function sanitizeChat() {
+  $("#chat").querySelectorAll("div").forEach((d) => {
+    if (!d.classList.length && d.textContent.trim() === "undefined") d.remove();
+  });
+}
+
 async function playMessages(msgs) {
   const chat = $("#chat");
   for (const { who, text } of msgs) {
@@ -113,6 +119,7 @@ async function playMessages(msgs) {
     await sleep(150);
   }
   scrollBottom();
+  sanitizeChat();
 }
 
 function buildMsgStatic(who, text) {
@@ -242,6 +249,7 @@ function onChoice(choiceId, btnEl) {
     $("#chat").append(buildMsgStatic(outcome.result.who, outcome.result.text));
   }
   showDeltas(outcome.deltas);
+  sanitizeChat();
   renderTop(st, new Set(Object.keys(outcome.deltas)), lastStats);
   lastStats = { ...st.stats };
   scrollBottom();
