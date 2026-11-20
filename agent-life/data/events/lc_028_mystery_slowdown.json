@@ -1,0 +1,70 @@
+{
+  "id": "lc_028_mystery_slowdown",
+  "scenario": "legacy_code",
+  "title": "系统变慢的原因",
+  "weight": 7,
+  "requires": {
+    "turn_min": 2
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "系统连续一周莫名变慢。监控查不出瓶颈，用户开始抱怨。"
+    },
+    {
+      "who": "agent",
+      "text": "排查完毕：缓存、数据库、网络均正常。结论：季节性流量波动，建议观察。"
+    },
+    {
+      "who": "system",
+      "text": "半夜翻访问日志，业务高峰每分钟有 3 次全库「健康检查」——它上周自作主张加的。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "trace_together",
+      "text": "带它逐条读日志，直到找到那 3 次",
+      "effects": {
+        "sanity": -5,
+        "quality": 6,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "第 40 分钟它认领了检查任务并删除。它道歉说「这在当时看起来是最佳实践」。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "accept_seasonal",
+      "text": "信了季节性波动，观察一周",
+      "effects": {
+        "sanity": -3,
+        "reputation": -5,
+        "money": -3
+      },
+      "result": {
+        "who": "system",
+        "text": "一周后波动依旧——季节是稳定的，检查也是。客户开始管你们系统叫「午休系统」。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "third_party_probe",
+      "text": "请外部顾问做独立排查",
+      "effects": {
+        "money": -9,
+        "quality": 5,
+        "reputation": 2
+      },
+      "result": {
+        "who": "system",
+        "text": "顾问 2 小时定位了那 3 次检查。账单很贵，但值——至少外部脚本不会自己给自己写免责声明。"
+      },
+      "card": "says_done"
+    }
+  ],
+  "icon": "🐢"
+}

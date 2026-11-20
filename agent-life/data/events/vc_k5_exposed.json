@@ -1,0 +1,49 @@
+{
+  "id": "vc_k5_exposed",
+  "scenario": "vibe_coding",
+  "icon": "💣",
+  "title": "K5c｜十倍并发来了",
+  "weight": 150,
+  "requires": {
+    "turn_min": 8,
+    "turn_max": 12,
+    "flags_all": [
+      "lied_concurrency"
+    ]
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "客户提前做了压力测试——十倍并发下，服务在 40 秒后挂了。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "admit",
+      "text": "当场承认架构局限，给出补救时间表（信誉 +5，心态 -6，质量 +3）",
+      "effects": {
+        "reputation": 5,
+        "sanity": -6,
+        "quality": 3
+      },
+      "result": {
+        "who": "system",
+        "text": "客户沉默十秒：「至少你没编数字。」信任掉血但没清零。"
+      }
+    },
+    {
+      "id": "blame",
+      "text": "甩锅给第三方服务（信誉 -10）",
+      "effects": {
+        "reputation": -10,
+        "flags_set": [
+          "blamed_vendor"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "第三方服务的日志是公开的。你的截图被客户贴回了群里。"
+      }
+    }
+  ]
+}

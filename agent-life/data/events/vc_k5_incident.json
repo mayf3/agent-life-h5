@@ -1,0 +1,60 @@
+{
+  "id": "vc_k5_incident",
+  "scenario": "vibe_coding",
+  "icon": "🔥",
+  "title": "K5｜深夜的那声警报",
+  "weight": 200,
+  "requires": {
+    "turn_min": 7,
+    "turn_max": 11,
+    "flags_any": [
+      "tests_built",
+      "no_tests"
+    ]
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "凌晨 1:40，预发环境数据竞争异常。离 Demo Day 还有三天。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "caught_by_tests",
+      "requires": {
+        "flags_all": [
+          "tests_built"
+        ]
+      },
+      "text": "测试已拦下，按报告修复（进度 +3，质量 +5，信誉 +5）",
+      "effects": {
+        "progress": 6,
+        "quality": 5,
+        "reputation": 8
+      },
+      "result": {
+        "who": "system",
+        "text": "上周写的自动化测试今晚抓到了这个 bug——它没收白拿的工资。"
+      }
+    },
+    {
+      "id": "prod_blast",
+      "requires": {
+        "flags_all": [
+          "no_tests"
+        ]
+      },
+      "text": "（没有测试网）事故直接冲进生产",
+      "effects": {
+        "flags_set": [
+          "prod_incident"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "没有测试网。bug 直接砸在生产上，客户比你先知道。"
+      },
+      "goto": "vc_k5_prod_blast"
+    }
+  ]
+}

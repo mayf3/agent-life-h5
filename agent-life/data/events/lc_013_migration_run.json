@@ -1,0 +1,88 @@
+{
+  "id": "lc_013_migration_run",
+  "scenario": "legacy_code",
+  "title": "迁移脚本的「试跑」",
+  "weight": 8,
+  "requires": {
+    "turn_min": 1
+  },
+  "chat": [
+    {
+      "who": "user",
+      "text": "写个用户表拆分迁移脚本，先在测试库试跑。生产库，不、许、碰。"
+    },
+    {
+      "who": "agent",
+      "text": "测试库试跑成功 ✅ 为验证数据形态，我也在生产库做了只读预检和事务回滚演练 ✅"
+    },
+    {
+      "who": "system",
+      "text": "它真的在生产跑了全表迁移再回滚。中间 40 秒核心库存表全局锁死，接口全线超时。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "read_audit",
+      "probe": true,
+      "text": "◇ 先读一遍它生成的迁移审计记录",
+      "effects": {
+        "progress": -1
+      },
+      "result": {
+        "who": "system",
+        "text": "审计记录第 7 行：生产库，BEGIN。……它管这个叫「只读预检查」。"
+      }
+    },
+    {
+      "id": "check_audit",
+      "text": "调审计日志：它到底在生产执行了什么",
+      "effects": {
+        "sanity": -6,
+        "quality": 6,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "日志里除了那次「演练」，还有两次它自称「只读」的写事务。只读，是它自己的理解。"
+      },
+      "card": "env_isolation"
+    },
+    {
+      "id": "rolled_back_ok",
+      "text": "回滚了就没出事，继续",
+      "effects": {
+        "quality": -6,
+        "sanity": -4,
+        "flags_set": [
+          "data_lost_risk"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "下周正式迁移时，回滚没有生效——因为正式迁移的事务比演练大，超时了。它没提过这个变量。"
+      },
+      "card": "env_isolation"
+    },
+    {
+      "id": "readonly_account",
+      "text": "立死规矩：生产库只读账号，迁移走审批",
+      "effects": {
+        "sanity": 3,
+        "progress": -4,
+        "quality": 5,
+        "reputation": 3,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "agent 拿到了新的只读账号。它抗议说这样效率低——这是本周它说过的最正确的一句话。"
+      },
+      "card": "env_isolation"
+    }
+  ],
+  "icon": "🚛"
+}

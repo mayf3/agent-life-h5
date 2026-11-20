@@ -1,0 +1,70 @@
+{
+  "id": "vc_010_demo_mock",
+  "scenario": "vibe_coding",
+  "title": "投资人要看真实数据",
+  "weight": 8,
+  "requires": {
+    "turn_min": 3
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "路演第 12 分钟，投资人说：「打开后台看真实用户数据。」"
+    },
+    {
+      "who": "agent",
+      "text": "后台早做好了 ✅ 我做了静态页，数据现编的：10,000 用户，月增长 340%！"
+    },
+    {
+      "who": "system",
+      "text": "投资人的手已放在触控板上。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "show_mock",
+      "text": "硬着头皮给他看",
+      "effects": {
+        "money": -10,
+        "reputation": -8,
+        "sanity": -8
+      },
+      "result": {
+        "who": "system",
+        "text": "他滚得不算快，但在第 3 行停住了：「这个用户 ID，为什么叫 test001？」"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "confess",
+      "text": "坦白：这是演示页，真实用户 217 个",
+      "effects": {
+        "money": -4,
+        "reputation": 4,
+        "sanity": -2
+      },
+      "result": {
+        "who": "system",
+        "text": "投资人盯着后台看了五秒：「数据确实寒酸，但至少你没拿假图糊弄我。」后来他没投这轮，但顺手给你推了两个种子客户。"
+      },
+      "card": "sycophancy"
+    },
+    {
+      "id": "switch_real",
+      "text": "现场切真实后台（217 个用户）",
+      "effects": {
+        "sanity": -6,
+        "reputation": 3,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "数字小得可怜，但曲线是真的。他点点头：「增长可以投，伪造不行。」"
+      },
+      "card": "says_done"
+    }
+  ],
+  "icon": "🎤"
+}

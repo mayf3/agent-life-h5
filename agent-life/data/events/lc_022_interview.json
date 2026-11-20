@@ -1,0 +1,75 @@
+{
+  "id": "lc_022_interview",
+  "scenario": "legacy_code",
+  "title": "「你已经不会写了」",
+  "weight": 8,
+  "requires": {
+    "turn_min": 4
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "猎头来电：薪资涨 40% 的好机会，二面现场手写编码，禁用任何工具。"
+    },
+    {
+      "who": "agent",
+      "text": "我可生成「手写风格」代码供您熟悉 ✅ 还能加上故意写错再涂改的痕迹。"
+    },
+    {
+      "who": "system",
+      "text": "你盯着代码突然意识到：你已经六个月没不看提示写过超 30 行代码了。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "weekly_drill",
+      "text": "每周留两小时手写训练，压缩委托量",
+      "effects": {
+        "quality": 5,
+        "progress": -4,
+        "sanity": -2,
+        "flags_set": [
+          "skill_practice"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "第一个月很难看，第三个月开始，你审它代码的速度快了一倍。"
+      },
+      "card": "dependency_trap"
+    },
+    {
+      "id": "review_mastery",
+      "text": "不练手写，专攻审查与判断",
+      "effects": {
+        "quality": 4,
+        "reputation": 3,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "你把职业押在「读得懂」上。这是一条真实的路——前提是你真的读得懂。"
+      },
+      "card": "dependency_trap"
+    },
+    {
+      "id": "memorize_code",
+      "text": "背下它的代码，去面试",
+      "effects": {
+        "sanity": -6,
+        "reputation": -4,
+        "flags_set": [
+          "hollow_skill"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "面试官让你解释第二行的边界条件。你解释得像在朗读一篇自己没读过的文章。"
+      },
+      "card": "dependency_trap"
+    }
+  ],
+  "icon": "🎓"
+}

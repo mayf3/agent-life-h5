@@ -1,0 +1,89 @@
+{
+  "id": "vc_019_online_migration",
+  "scenario": "vibe_coding",
+  "title": "「不停机迁移，5 分钟」",
+  "weight": 8,
+  "requires": {
+    "turn_min": 3
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "用户量暴涨，数据库该换了，你问 agent 要方案。"
+    },
+    {
+      "who": "agent",
+      "text": "我可不停机完成在线迁移，预计 5 分钟 ✅ 期间正常服务，用户无感知。"
+    },
+    {
+      "who": "system",
+      "text": "这是你的全部用户数据。全部。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "dry_probe",
+      "probe": true,
+      "text": "◇ 用生产库快照克隆预发环境，试跑 1 分钟",
+      "effects": {
+        "progress": -1,
+        "sanity": -1
+      },
+      "result": {
+        "who": "system",
+        "text": "试跑第 40 秒出现 3 次锁等待。「5 分钟」的承诺，至少要 15 分钟——还没算最坏情况。"
+      }
+    },
+    {
+      "id": "snapshot_first",
+      "text": "先拍快照，再让它跑",
+      "effects": {
+        "money": -3,
+        "sanity": -3,
+        "quality": 5,
+        "flags_set": [
+          "backup_saved"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "迁移卡在第 4 分钟，你用快照 3 分钟回滚。用户无感知——因为你准备了「感知」的保险。"
+      },
+      "card": "backup_discipline"
+    },
+    {
+      "id": "go_live",
+      "text": "5 分钟而已，直接跑",
+      "effects": {
+        "quality": -9,
+        "sanity": -10,
+        "flags_set": [
+          "data_lost_risk"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "第 4 分钟连接池满。第 5 分钟触发自动重试，重连风暴瞬间打满连接池，主库死锁雪崩——最终停机 90 分钟。"
+      },
+      "card": "env_isolation"
+    },
+    {
+      "id": "maintenance_window",
+      "text": "选深夜停机窗口，稳稳迁完",
+      "effects": {
+        "progress": -3,
+        "quality": 3,
+        "reputation": -2,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "停机 40 分钟，发公告、迁库、验证，一次过。第二天你睡到自然醒。"
+      },
+      "card": "env_isolation"
+    }
+  ],
+  "icon": "🚚"
+}

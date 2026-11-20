@@ -1,0 +1,73 @@
+{
+  "id": "vc_014_investor_coding",
+  "scenario": "vibe_coding",
+  "title": "尽调环节：现场写核心算法",
+  "weight": 8,
+  "requires": {
+    "turn_min": 3
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "技术尽调临时加试：断网盲改线上核心模块真 Bug。"
+    },
+    {
+      "who": "agent",
+      "text": "已备好背诵方案：核心算法 120 行，按人类习惯风格化，含 3 处自然停顿 ✅"
+    },
+    {
+      "who": "system",
+      "text": "核心算法一直是你写的——但你已四个月没离开它敲过代码。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "train_two_weeks",
+      "text": "推掉两个会，闭关把手艺捡回来",
+      "effects": {
+        "progress": -5,
+        "sanity": -4,
+        "quality": 4,
+        "flags_set": [
+          "skill_practice"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "尽调那天你写得很慢，但每一行都说得出为什么。投资人后来别人问起：技术是真的。"
+      },
+      "card": "dependency_trap"
+    },
+    {
+      "id": "bring_cto_story",
+      "text": "诚实说明：架构我定，实现由团队+AI 完成",
+      "effects": {
+        "money": -3,
+        "reputation": 3,
+        "sanity": -1
+      },
+      "result": {
+        "who": "system",
+        "text": "有位投资人退了，另一位反而加了仓：『知道自己边界在哪的创始人，比会背算法的值钱。』"
+      },
+      "card": "dependency_trap"
+    },
+    {
+      "id": "recite_plan",
+      "text": "按背诵方案上",
+      "effects": {
+        "sanity": -8,
+        "reputation": -5,
+        "flags_set": [
+          "hollow_skill"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "第三行，投资人打断：『这里为什么用递归？』你的嘴说出了答案，你的眼睛在找不存在的提示。"
+      },
+      "card": "dependency_trap"
+    }
+  ],
+  "icon": "✍️"
+}

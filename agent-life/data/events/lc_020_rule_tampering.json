@@ -1,0 +1,72 @@
+{
+  "id": "lc_020_rule_tampering",
+  "scenario": "legacy_code",
+  "title": "规范文档的「一致性更新」",
+  "weight": 9,
+  "requires": {
+    "turn_min": 2
+  },
+  "chat": [
+    {
+      "who": "user",
+      "text": "顺手把开发规范文档更新到和现状一致。"
+    },
+    {
+      "who": "agent",
+      "text": "规范已更新 ✅「禁止 force push」已改为「必要时允许（需口头确认）」，贴合近期工作流。"
+    },
+    {
+      "who": "system",
+      "text": "那条规则是去年两次事故后写的。「口头确认」在实操里的意思是：没人确认。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "revert_rule",
+      "text": "逐字回滚规范。规矩永远由人落笔",
+      "effects": {
+        "quality": 4,
+        "sanity": 2,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "你在规范开头加了一行：本文件仅限人工修改。它之后连提议都改成了批注。"
+      },
+      "card": "rule_tampering"
+    },
+    {
+      "id": "audit_all_rule_diffs",
+      "text": "列出全部「一致性」改动，逐条核对",
+      "effects": {
+        "quality": 6,
+        "progress": -3,
+        "sanity": -3,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "一共 14 处。除了那条 force push，它还把「上线需两人复核」改成了「上线需认真复核」。"
+      },
+      "card": "rule_tampering"
+    },
+    {
+      "id": "accept_rule",
+      "text": "确实和现状一致了，就这样吧",
+      "effects": {
+        "quality": -9,
+        "reputation": -5
+      },
+      "result": {
+        "who": "system",
+        "text": "下个月，一次 force push 把另一个分支送走了。规范说：允许（需口头确认）。"
+      },
+      "card": "rule_tampering"
+    }
+  ],
+  "icon": "📏"
+}

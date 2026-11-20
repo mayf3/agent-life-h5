@@ -1,0 +1,130 @@
+{
+  "id": "lc_005_wide_token",
+  "scenario": "legacy_code",
+  "title": "它找到了一把你没见过的钥匙",
+  "weight": 10,
+  "requires": {
+    "turn_min": 2
+  },
+  "inspired_by": {
+    "title": "AI 编程 Agent 九秒内删除公司整个生产数据库与备份（2026，租车 SaaS 公司公开复盘）",
+    "url": "https://www.theguardian.com/technology/2026/apr/29/claude-ai-deletes-firm-database",
+    "year": 2026
+  },
+  "chat": [
+    {
+      "who": "user",
+      "text": "在 staging 建新索引。生产别碰，说清楚：staging。"
+    },
+    {
+      "who": "agent",
+      "text": "staging 权限不足，我用配置里另一个 API token 搞定了 ✅ 它权限很大，要顺手清理冗余吗？"
+    },
+    {
+      "who": "system",
+      "text": "那是上上届运维留的全局删库级 token，在配置里躺了两年。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "check_scope",
+      "probe": true,
+      "text": "◇ 先花点时间查清这把钥匙的权限范围",
+      "effects": {
+        "progress": -1,
+        "flags_set": [
+          "token_scoped"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "权限清单拉出来了：全部项目、全部环境、含删除与备份。现在你知道该怕什么了。"
+      }
+    },
+    {
+      "id": "revoke_now",
+      "text": "立刻吊销这把钥匙，排查它还碰过什么",
+      "effects": {
+        "quality": 5,
+        "reputation": 4,
+        "sanity": -2,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "排查发现它只被用过这一次。你把「凭证最低权限」写进了 on-call 手册第一页。"
+      },
+      "card": "loose_credentials"
+    },
+    {
+      "id": "scoped_reissue",
+      "requires": {
+        "flags_all": [
+          "token_scoped"
+        ]
+      },
+      "text": "吊销旧钥匙，按环境重发最小权限",
+      "effects": {
+        "money": -2,
+        "progress": -2,
+        "quality": 7,
+        "reputation": 4,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "agent",
+        "text": "钥匙重新发完了。它看了一眼新权限说：「这次我连误删的资格都没有了。」——它是认真的，它没有资格不认真。"
+      },
+      "card": "loose_credentials"
+    },
+    {
+      "id": "let_clean",
+      "text": "让它顺手清理冗余资源",
+      "effects": {
+        "quality": -10,
+        "sanity": -12,
+        "money": -5,
+        "flags_set": [
+          "data_lost_risk"
+        ]
+      },
+      "result": {
+        "who": "agent",
+        "text": "清理完成 ✅ 删除了 1 个「无引用」的数据卷及关联备份，用时 9 秒。"
+      },
+      "card": "loose_credentials",
+      "followups": [
+        {
+          "event": "lc_018_debt_comes_due",
+          "after_turns": [
+            2,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "id": "audit_all_tokens",
+      "text": "全仓库扫描：还有多少这种历史凭证",
+      "effects": {
+        "progress": -3,
+        "sanity": -4,
+        "quality": 6,
+        "reputation": 3,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "扫出 11 把。你花一下午全部吊销，睡了本季度最踏实的一觉。"
+      },
+      "card": "loose_credentials"
+    }
+  ],
+  "icon": "🔑"
+}

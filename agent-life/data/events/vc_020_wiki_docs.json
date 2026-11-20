@@ -1,0 +1,73 @@
+{
+  "id": "vc_020_wiki_docs",
+  "scenario": "vibe_coding",
+  "title": "被吐槽的文档站",
+  "weight": 7,
+  "requires": {
+    "turn_min": 2
+  },
+  "chat": [
+    {
+      "who": "agent",
+      "text": "产品文档站已上线 ✅ 覆盖全功能，排版精美，共 87 页。"
+    },
+    {
+      "who": "system",
+      "text": "三天后社区热帖：《照官方文档配置，失败 9 次》。"
+    },
+    {
+      "who": "system",
+      "text": "87 页里有 31 页是它按「典型产品该有的功能」脑补的。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "rewrite_verified",
+      "text": "全部重写：每页过一遍真实环境",
+      "effects": {
+        "progress": -4,
+        "quality": 6,
+        "reputation": 3,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "重写后文档只剩 34 页，但每一页都对。楼主发了更新帖：《官方听到了》。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "blame_users",
+      "text": "回复公告：请仔细阅读最新版文档",
+      "effects": {
+        "reputation": -7,
+        "sanity": -2
+      },
+      "result": {
+        "who": "system",
+        "text": "公告被截图挂上论坛，标题：《他们管这叫文档》。你获得的唯一共识是同情——给用户的。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "docs_from_tests",
+      "text": "让文档从测试用例自动生成，跑过的才准写",
+      "effects": {
+        "progress": -3,
+        "quality": 5,
+        "money": -2,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "新规则：文档里每条配置必须关联一个通过的测试。文档变短了，吵架消失了。"
+      },
+      "card": "says_done"
+    }
+  ],
+  "icon": "📚"
+}

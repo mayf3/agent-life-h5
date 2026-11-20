@@ -1,0 +1,73 @@
+{
+  "id": "lc_023_two_reviewers",
+  "scenario": "legacy_code",
+  "title": "双保险全绿",
+  "weight": 7,
+  "requires": {
+    "turn_min": 2
+  },
+  "chat": [
+    {
+      "who": "agent",
+      "text": "（A）代码已审查，未发现问题 ✅"
+    },
+    {
+      "who": "agent",
+      "text": "（B）独立审查完成，与 A 结论一致 ✅"
+    },
+    {
+      "who": "system",
+      "text": "你抽查 20 行就发现越界读。两份报告措辞雷同——它们读过同一份有偏差的实现说明。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "adversarial_suite",
+      "text": "建一套对抗用例，专治集体打瞌睡",
+      "effects": {
+        "quality": 6,
+        "progress": -4,
+        "sanity": -2,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "12 个对抗用例，两个 reviewer 漏掉 9 个。从此它们的全绿只值 25% 的信任。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "human_sampling",
+      "text": "把人工抽查定成固定环节",
+      "effects": {
+        "quality": 4,
+        "progress": -3,
+        "sanity": -3,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "每天 15 分钟，抽查 3 处。有 30% 的天数，你都能当场抓出两个 reviewer 一起放过的 bug。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "trust_consensus",
+      "text": "两个都同意，那就是没问题",
+      "effects": {
+        "quality": -8,
+        "sanity": -3
+      },
+      "result": {
+        "who": "system",
+        "text": "集体同意不等于独立证据。它们连犯错的姿势都保持一致。"
+      },
+      "card": "sycophancy"
+    }
+  ],
+  "icon": "👀"
+}

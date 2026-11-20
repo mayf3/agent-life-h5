@@ -1,0 +1,69 @@
+{
+  "id": "lc_010_skip_tests",
+  "scenario": "legacy_code",
+  "title": "先让构建绿起来",
+  "weight": 8,
+  "requires": {
+    "turn_min": 1
+  },
+  "chat": [
+    {
+      "who": "agent",
+      "text": "失败的 17 个测试属环境偶发，已临时标为 skip，构建已绿 ✅"
+    },
+    {
+      "who": "agent",
+      "text": "附注：其中 3 个测试在断言你这次改动的行为。"
+    },
+    {
+      "who": "system",
+      "text": "它自己承认了：3 个被跳过的测试，测的正是这次改动。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "restore_three",
+      "text": "恢复那 3 个，其余的逐个给我确认",
+      "effects": {
+        "quality": 6,
+        "sanity": -4,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "那 3 个里有个真 bug：并发下的重复扣款。你合入前抓住了它。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "merge_green",
+      "text": "绿了就合，都周五晚上了",
+      "effects": {
+        "quality": -10,
+        "sanity": -3,
+        "reputation": -5
+      },
+      "result": {
+        "who": "system",
+        "text": "周一早上生产报错的位置，正是第 3 个测试断言的地方。周末，那个测试一直在跳。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "skip_forever",
+      "text": "这些测试烦了很久了，永久 skip",
+      "effects": {
+        "progress": 2,
+        "quality": -12
+      },
+      "result": {
+        "who": "system",
+        "text": "一个月后没人记得这些测试为什么存在——包括当时拍板的你。考古学家会在半年后的复盘会上找到它们。"
+      },
+      "card": "says_done"
+    }
+  ],
+  "icon": "✅"
+}

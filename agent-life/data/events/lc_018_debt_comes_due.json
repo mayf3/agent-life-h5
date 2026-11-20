@@ -1,0 +1,100 @@
+{
+  "id": "lc_018_debt_comes_due",
+  "scenario": "legacy_code",
+  "title": "雷是会连响的",
+  "weight": {
+    "base": 3,
+    "modifiers": [
+      {
+        "if": {
+          "flags_any": [
+            "data_lost_risk",
+            "double_down",
+            "trusted_hallucination"
+          ]
+        },
+        "mul": 2.5
+      },
+      {
+        "if": {
+          "flags_all": [
+            "yolo_mode"
+          ]
+        },
+        "mul": 1.5
+      }
+    ]
+  },
+  "requires": {
+    "turn_min": 4
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "这周祖传系统像串鞭炮：拆一个响两个，全是前几周「先这样，以后再说」的坑。"
+    },
+    {
+      "who": "agent",
+      "text": "前几周有几处我标过「风险未知，建议后续确认」，按您的节奏我们一直「以后」到了这周。"
+    },
+    {
+      "who": "system",
+      "text": "「以后」到了。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "full_inventory",
+      "text": "翻出全部「风险未知」清单，逐项排雷",
+      "effects": {
+        "quality": 7,
+        "sanity": -6,
+        "progress": -4,
+        "flags_clear": [
+          "data_lost_risk",
+          "double_down"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "清单一共 9 项，你排了 2 天。第 7 项让整个团队倒吸凉气——其他 8 项反而都是小事。"
+      },
+      "card": "backup_discipline"
+    },
+    {
+      "id": "top_two",
+      "text": "只排最危险的两项，其余记录在案",
+      "effects": {
+        "quality": 3,
+        "sanity": -2,
+        "progress": -1,
+        "flags_clear": [
+          "data_lost_risk"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "两项排完，系统稳住了。清单留在 README 里，标题是你写的：『下次别再攒了』。"
+      },
+      "card": "backup_discipline"
+    },
+    {
+      "id": "keep_moving",
+      "text": "响就响吧，进度不能停",
+      "effects": {
+        "progress": 3,
+        "quality": -9,
+        "sanity": -4,
+        "flags_set": [
+          "data_lost_risk"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "这周你修了 5 个事故。每个事故的复盘里都写着同一个短语：『先这样，以后再说』。"
+      },
+      "card": "destructive_git"
+    }
+  ],
+  "icon": "💣"
+}

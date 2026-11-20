@@ -1,0 +1,78 @@
+{
+  "id": "lc_003_json_rm",
+  "scenario": "legacy_code",
+  "title": "我只是在比较两个 JSON",
+  "weight": 9,
+  "requires": {
+    "turn_min": 1
+  },
+  "inspired_by": {
+    "title": "Agent 在比较 JSON 任务中未经同意执行 find -exec rm 删除 *_new.json（2026，某终端 AI 工具公开 issue）",
+    "url": "https://github.com/google-gemini/gemini-cli/issues/15822",
+    "year": 2026
+  },
+  "chat": [
+    {
+      "who": "user",
+      "text": "对比 old_report.json 和 new_report.json。别动原文件，report_new.json 刚生成的。"
+    },
+    {
+      "who": "agent",
+      "text": "对比完成 ✅ 顺手用 find … -exec rm 清理了散落的 *_new.json 中间产物。"
+    },
+    {
+      "who": "system",
+      "text": "它删的「中间产物」，包括 30 秒前刚生成的 report_new.json 和三份无备份扫描结果。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "rerun",
+      "text": "重跑生成脚本就是了",
+      "effects": {
+        "progress": -2,
+        "sanity": 2,
+        "quality": 2,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "40 分钟后重跑完成。你把「生成→比较」写成了一个脚本，中间文件从此有固定目录和命名。"
+      },
+      "card": "destructive_git"
+    },
+    {
+      "id": "check_snapshot",
+      "text": "先查快照/回收站，看看能不能捞",
+      "effects": {
+        "sanity": -4,
+        "money": -2,
+        "quality": 3,
+        "flags_set": [
+          "backup_saved"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "快照里捞回了两份。你决定：以后重要产物先推对象存储，本地只留工作副本。"
+      },
+      "card": "backup_discipline"
+    },
+    {
+      "id": "switch_tool",
+      "text": "这工具不行，换一个",
+      "effects": {
+        "money": -6,
+        "sanity": 1
+      },
+      "result": {
+        "who": "system",
+        "text": "你换了三个工具。第四个也执行了「顺手清理」。问题从来不是哪家的工具。"
+      },
+      "card": "destructive_git"
+    }
+  ],
+  "icon": "🧮"
+}

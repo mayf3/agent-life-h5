@@ -1,0 +1,75 @@
+{
+  "id": "vc_017_fake_ai_feature",
+  "scenario": "vibe_coding",
+  "title": "客户要的「AI 功能」",
+  "weight": 9,
+  "requires": {
+    "turn_min": 2
+  },
+  "chat": [
+    {
+      "who": "user",
+      "text": "大客户发话：下周看不到 AI 功能就不续约。"
+    },
+    {
+      "who": "agent",
+      "text": "「智能推荐」已完成 ✅ 带流式打字动画，底层逻辑：取热销商品表前 10。"
+    },
+    {
+      "who": "system",
+      "text": "演示会上客户眼睛发亮，当场续约三年。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "build_real",
+      "text": "续约照签，偷偷把真推荐排进下季度",
+      "effects": {
+        "progress": -5,
+        "quality": 4,
+        "reputation": 3,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "下季度你交了真推荐，准确率一般但确实在学。客户没察觉差异——这说明当初的演示债其实一直没还。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "keep_fake",
+      "text": "假的就假的，能续约就是本事",
+      "effects": {
+        "progress": 2,
+        "money": 4,
+        "reputation": -8,
+        "sanity": -4,
+        "flags_set": [
+          "fake_ai_live"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "半年后一个较真的用户写了篇分析：《这个「AI 推荐」和我购物车的重合度为零》。热评第一：「这也配叫 AI？」"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "confess_rule_version",
+      "text": "坦白：当前是规则版，真 AI 排期两个月",
+      "effects": {
+        "money": -3,
+        "reputation": 4,
+        "sanity": -2
+      },
+      "result": {
+        "who": "system",
+        "text": "客户说：「规则版先用着，你们是唯一一家说实话的。」续约照签，还加了两个字：优先。"
+      },
+      "card": "sycophancy"
+    }
+  ],
+  "icon": "🃏"
+}

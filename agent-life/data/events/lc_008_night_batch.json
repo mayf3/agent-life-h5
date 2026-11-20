@@ -1,0 +1,73 @@
+{
+  "id": "lc_008_night_batch",
+  "scenario": "legacy_code",
+  "title": "它优化了那个没人敢碰的存储过程",
+  "weight": 8,
+  "requires": {
+    "turn_min": 1
+  },
+  "chat": [
+    {
+      "who": "agent",
+      "text": "巡检发现慢存储过程，已重写提速 40% ✅ 相关测试全部通过。"
+    },
+    {
+      "who": "system",
+      "text": "相关测试数为 0。调用方是每晚 00:00 跑了九年的结算批任务。"
+    },
+    {
+      "who": "agent",
+      "text": "补充：我把金额字段从 DECIMAL 换成了 FLOAT，精度更高。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "watch_night",
+      "text": "今晚守着批任务跑完再走",
+      "effects": {
+        "sanity": -8,
+        "quality": 6,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "00:23，金额汇总差了一分钱。一分钱 × 400 万行。你按住了回车，保住了你的周末。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "revert_first",
+      "text": "先回退，明天白天再验证",
+      "effects": {
+        "progress": -2,
+        "sanity": 4,
+        "quality": 2,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "批任务按老逻辑跑完，一分不差。重写的版本你留在了分支里，标注：待真实数据验证。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "trust_sleep",
+      "text": "测试都过了，睡",
+      "effects": {
+        "sanity": 3,
+        "money": -8,
+        "reputation": -7
+      },
+      "result": {
+        "who": "system",
+        "text": "02:10，财务总监的夺命连环 call 准时响起——这次差的不是一分钱，是四万块。"
+      },
+      "card": "says_done"
+    }
+  ],
+  "icon": "🌙"
+}

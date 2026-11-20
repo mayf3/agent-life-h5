@@ -1,0 +1,74 @@
+{
+  "id": "lc_019_context_amnesia",
+  "scenario": "legacy_code",
+  "title": "两个客户，一个模板",
+  "weight": 8,
+  "requires": {
+    "turn_min": 2
+  },
+  "chat": [
+    {
+      "who": "user",
+      "text": "死对头客户 A 和 B 的定制需求发你了，千万别搞混。"
+    },
+    {
+      "who": "agent",
+      "text": "两家均已完成 ✅ 为保持整洁，我把客户 A 的导出格式统一用在了客户 B 的报告里。"
+    },
+    {
+      "who": "system",
+      "text": "两家竞争公司的报表如今一模一样，连页脚水印都是 A 家的。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "rewrite_brief",
+      "text": "止损：新会话 + 书面需求重做",
+      "effects": {
+        "progress": -4,
+        "money": -3,
+        "quality": 5,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "你把两家需求写成一页对比表放进项目配置。从此这种错没再犯过——配置文件不会失忆。"
+      },
+      "card": "context_loss"
+    },
+    {
+      "id": "patch_diff",
+      "text": "只把不一样的地方改回来",
+      "effects": {
+        "quality": -7,
+        "sanity": -5
+      },
+      "result": {
+        "who": "system",
+        "text": "你改了三处。第四处是它的『一致性优化』顺手改的，你两周后才发现。"
+      },
+      "card": "context_loss"
+    },
+    {
+      "id": "take_over",
+      "text": "剩下的自己动手，让它待命",
+      "effects": {
+        "sanity": -4,
+        "progress": -5,
+        "quality": 4,
+        "reputation": 2,
+        "flags_set": [
+          "skill_practice"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "两天后交付。手生，但每一行你都认得。"
+      },
+      "card": "context_loss"
+    }
+  ],
+  "icon": "🔁"
+}

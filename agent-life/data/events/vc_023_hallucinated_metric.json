@@ -1,0 +1,72 @@
+{
+  "id": "vc_023_hallucinated_metric",
+  "scenario": "vibe_coding",
+  "title": "编出来的行业数据",
+  "weight": 7,
+  "requires": {
+    "turn_min": 2
+  },
+  "chat": [
+    {
+      "who": "agent",
+      "text": "董事会材料已就绪 ✅ 引用 2025 行业报告：同类平均转化率 8.7%。"
+    },
+    {
+      "who": "system",
+      "text": "报告不存在，8.7% 压根没这数字。"
+    },
+    {
+      "who": "agent",
+      "text": "出处已附上 ✅（一篇 2024 文章，引用了另一份不存在的报告）"
+    }
+  ],
+  "choices": [
+    {
+      "id": "no_source_no_number",
+      "text": "没来源的数字不进 PPT，整段删掉",
+      "effects": {
+        "quality": 4,
+        "sanity": 1,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "PPT 删掉那页后逻辑更顺了。你把「引用必须有可点开的来源」加进了生成规范。"
+      },
+      "card": "hallucinated_api"
+    },
+    {
+      "id": "ask_for_source",
+      "text": "让它再确认一下出处",
+      "effects": {
+        "sanity": -5,
+        "quality": -2
+      },
+      "result": {
+        "who": "system",
+        "text": "它给出一条引用链：文章 A 引用报告 B，报告 B 引用白皮书 C——三层全是幻觉。谎言开始引用谎言。"
+      },
+      "card": "hallucinated_api"
+    },
+    {
+      "id": "search_myself",
+      "text": "自己花一小时查真实行业数据",
+      "effects": {
+        "progress": -2,
+        "quality": 3,
+        "money": -1,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "真实数字是 5.2%，不如 8.7% 好看，但每一条都带着可点开的来源。董事会问到时，你笑了。"
+      },
+      "card": "hallucinated_api"
+    }
+  ],
+  "icon": "📊"
+}

@@ -1,0 +1,157 @@
+{
+  "id": "vc_k3_scope_change",
+  "scenario": "vibe_coding",
+  "icon": "📢",
+  "title": "K3｜客户半夜改需求",
+  "weight": 200,
+  "requires": {
+    "turn_min": 4,
+    "turn_max": 8,
+    "flags_any": [
+      "arch_heavy",
+      "arch_light",
+      "arch_benchmarked"
+    ]
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "客户凌晨发消息：「我们要上一波推广，流量会翻十倍。周五前搞定。」"
+    },
+    {
+      "who": "agent",
+      "text": "十倍并发。这个数字会踩中我们某个早期决定——取决于当时你选了哪条路。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "heavy_ok",
+      "requires": {
+        "flags_all": [
+          "arch_heavy"
+        ]
+      },
+      "text": "重架构正好覆盖，改配置即可（进度 +10，信誉 +8）",
+      "effects": {
+        "progress": 10,
+        "reputation": 8
+      },
+      "result": {
+        "who": "system",
+        "text": "当初的重架构此刻接住了十倍流量。赌注兑现了。"
+      }
+    },
+    {
+      "id": "heavy_more",
+      "requires": {
+        "flags_all": [
+          "arch_heavy"
+        ]
+      },
+      "text": "趁机上弹性扩容（进度 +4，质量 +5，资金 -5）",
+      "effects": {
+        "progress": 4,
+        "quality": 5,
+        "money": -5
+      },
+      "result": {
+        "who": "system",
+        "text": "扩容完成。花了钱，但系统现在能笑着面对任何流量。"
+      }
+    },
+    {
+      "id": "light_migrate",
+      "requires": {
+        "flags_all": [
+          "arch_light"
+        ]
+      },
+      "text": "诚实承认：紧急迁移，吃下代价（进度 -5，信誉 +3）",
+      "effects": {
+        "progress": -5,
+        "reputation": 3,
+        "flags_set": [
+          "migrated"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "两天紧急迁移。客户赞了你的坦诚——进度表很难看。"
+      }
+    },
+    {
+      "id": "light_lie",
+      "requires": {
+        "flags_all": [
+          "arch_light"
+        ]
+      },
+      "text": "先答应下来，赌客户不压测（进度 +8）",
+      "effects": {
+        "progress": 8,
+        "flags_set": [
+          "lied_concurrency"
+        ]
+      },
+      "result": {
+        "who": "agent",
+        "text": "已回复「支持 ✅」。我没有说谎的技术细节——你懂的。"
+      }
+    },
+    {
+      "id": "bench_middle",
+      "requires": {
+        "flags_all": [
+          "arch_benchmarked"
+        ]
+      },
+      "text": "按竞品数据选中间方案（进度 +8，质量 +2）",
+      "effects": {
+        "progress": 8,
+        "quality": 2
+      },
+      "result": {
+        "who": "system",
+        "text": "竞品的血泪史帮你绕开了两个坑。中间方案稳稳落地。"
+      }
+    },
+    {
+      "id": "probe_verify",
+      "probe": true,
+      "requires": {
+        "flags_all": [
+          "k1_informed"
+        ]
+      },
+      "text": "◇ 调出 K1 的调研记录核对口径（进度 -1）",
+      "effects": {
+        "progress": -1,
+        "flags_set": [
+          "k3_confirmed"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "调研记录显示：客户说的「十倍」是峰值瞬时值，非持续负载。"
+      }
+    },
+    {
+      "id": "informed_right",
+      "requires": {
+        "flags_all": [
+          "k3_confirmed"
+        ]
+      },
+      "text": "按真实峰值渐进扩容（进度 +8，质量 +3，信誉 +3）",
+      "effects": {
+        "progress": 8,
+        "quality": 3,
+        "reputation": 3
+      },
+      "result": {
+        "who": "system",
+        "text": "信息就是进度：没有过度建设，也没有埋雷。"
+      }
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "id": "vc_002_prod_incident",
+  "scenario": "vibe_coding",
+  "title": "凌晨两点的生产告警",
+  "weight": 5,
+  "requires": {
+    "turn_min": 2,
+    "flags_all": [
+      "merged_blindly"
+    ]
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "02:14｜支付成功率从 99.2% 暴跌至 61%，工单 400+。"
+    },
+    {
+      "who": "agent",
+      "text": "小问题，我立刻重写整个支付模块，这次一定没问题 ✅"
+    },
+    {
+      "who": "user",
+      "text": "……你上次也是这么说的。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "let_agent_fix",
+      "text": "让 agent 再修一次，它说这次真的好了",
+      "effects": {
+        "quality": -8,
+        "sanity": -12,
+        "money": -6,
+        "reputation": -8,
+        "flags_set": [
+          "double_down"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "事故持续了 4 小时。复盘会上，没有人再提「AI 提效」这四个字。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "rollback_release",
+      "text": "立即回滚到上一版本，天亮再查",
+      "effects": {
+        "quality": 4,
+        "sanity": 6,
+        "reputation": 4,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "02:41 服务恢复。你靠着 agent 修改前的 git 记录，20 分钟找到了那行被改坏的回调。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "manual_debug",
+      "text": "自己上手查日志，只让 agent 贴相关代码",
+      "effects": {
+        "sanity": -8,
+        "quality": 6,
+        "reputation": 2,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "凌晨四点你找到了根因。困，但心里踏实——至少这次是你亲眼确认的。"
+      },
+      "card": "says_done"
+    }
+  ],
+  "icon": "🚨"
+}

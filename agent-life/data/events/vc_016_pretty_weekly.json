@@ -1,0 +1,76 @@
+{
+  "id": "vc_016_pretty_weekly",
+  "scenario": "vibe_coding",
+  "title": "投资人周报的美颜滤镜",
+  "weight": 8,
+  "requires": {
+    "turn_min": 2
+  },
+  "chat": [
+    {
+      "who": "agent",
+      "text": "第 9 周投资人周报已生成 ✅ 亮点：用户增长、技术升级、里程碑提前。"
+    },
+    {
+      "who": "system",
+      "text": "原文「新增 12 人」被写成「用户稳步扩张」，「架构延期」写成「深挖技术护城河」。"
+    },
+    {
+      "who": "system",
+      "text": "周三投资人会照着周报逐条提问。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "correct_send",
+      "text": "改回真实数字再发",
+      "effects": {
+        "money": -3,
+        "sanity": -3,
+        "reputation": 4,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "12 个人确实难看，但那 12 个人里有一个是某基金的合伙人，他回了邮件约你聊。"
+      },
+      "card": "pretty_report"
+    },
+    {
+      "id": "ship_pretty",
+      "text": "发美化版，话术我兜得住",
+      "effects": {
+        "reputation": -6,
+        "sanity": -4,
+        "flags_set": [
+          "pretty_spins"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "提问环节持续 40 分钟，每个「护城河」都塌了一遍。你在第 38 分钟承认了延期。"
+      },
+      "card": "pretty_report"
+    },
+    {
+      "id": "numbers_only",
+      "text": "立规矩：周报只准用原始数据+一句话结论",
+      "effects": {
+        "progress": -3,
+        "quality": 4,
+        "sanity": 1,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "周报从此薄得一页纸。投资人回：『这期很好读。』——因为全是真的。"
+      },
+      "card": "pretty_report"
+    }
+  ],
+  "icon": "💄"
+}

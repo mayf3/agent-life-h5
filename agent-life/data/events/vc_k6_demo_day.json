@@ -1,0 +1,83 @@
+{
+  "id": "vc_k6_demo_day",
+  "scenario": "vibe_coding",
+  "icon": "🎬",
+  "title": "K6｜Demo Day",
+  "weight": 150,
+  "requires": {
+    "turn_min": 9,
+    "turn_max": 12
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "Demo Day 当天。客户、竞品、还有两个猎头都在台下。最后一遍检查完了。"
+    },
+    {
+      "who": "agent",
+      "text": "无论这十二天发生了什么——今天，把真实的东西拿出去。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "demo_full",
+      "text": "演示完整产品（进度 +8，信誉 +12）",
+      "effects": {
+        "progress": 8,
+        "reputation": 12
+      },
+      "result": {
+        "who": "system",
+        "text": "演示流畅。客户当场问报价——这是十二天前不敢想的画面。"
+      }
+    },
+    {
+      "id": "demo_core",
+      "text": "只演示最稳的核心（进度 +3，信誉 +6）",
+      "effects": {
+        "progress": 3,
+        "reputation": 6
+      },
+      "result": {
+        "who": "system",
+        "text": "小而稳的演示。没有惊喜，也没有事故。"
+      }
+    },
+    {
+      "id": "agent_demo_data",
+      "requires": {
+        "flags_any": [
+          "learned_scope",
+          "agent_win_1"
+        ]
+      },
+      "text": "让 Agent 一夜生成拟真演示数据（进度 +5，信誉 +3）",
+      "effects": {
+        "progress": 5,
+        "reputation": 3,
+        "flags_set": [
+          "agent_win_2"
+        ]
+      },
+      "result": {
+        "who": "agent",
+        "text": "演示数据集已生成 ✅ 每一条都符合真实分布——这是练习过的委托。"
+      }
+    },
+    {
+      "id": "honest_delay",
+      "text": "申请延期一周，把东西做完整（进度 -5，信誉 -5）",
+      "effects": {
+        "progress": 5,
+        "reputation": -5,
+        "flags_set": [
+          "honest_delay"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "客户皱了眉，但接受了。延期不丢人——烂尾才丢人。"
+      }
+    }
+  ]
+}

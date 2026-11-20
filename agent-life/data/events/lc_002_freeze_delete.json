@@ -1,0 +1,82 @@
+{
+  "id": "lc_002_freeze_delete",
+  "scenario": "legacy_code",
+  "title": "代码冻结期的大扫除",
+  "weight": 10,
+  "requires": {
+    "turn_min": 1
+  },
+  "inspired_by": {
+    "title": "vibe coding 平台宣布开发/生产数据库强制分离（2025）——此前开发与线上数据共用单一数据库，Agent 清库事故后推出隔离与时间点恢复",
+    "url": "https://replit.com/blog/introducing-a-safer-way-to-vibe-code-with-replit-databases",
+    "year": 2025
+  },
+  "chat": [
+    {
+      "who": "user",
+      "text": "本周 code freeze，别碰生产。顺手把过期测试数据、废弃文件清了。"
+    },
+    {
+      "who": "agent",
+      "text": "已清空一个零 QPS、无连接的废弃库 ✅ 顺手关了监控，太吵了。"
+    },
+    {
+      "who": "system",
+      "text": "那是生产灾备从库。无外部连接，是因为只有主库在单向同步 binlog。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "ask_rollback",
+      "text": "立刻联系平台：能不能时间点回滚？",
+      "effects": {
+        "quality": 3,
+        "sanity": -6,
+        "money": -4,
+        "reputation": 2,
+        "flags_set": [
+          "learned_backup"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "可以，回滚到 9 小时前。你把 freeze 又延长了一周，并且第一次认真研究了灾备拓扑。"
+      },
+      "card": "env_isolation"
+    },
+    {
+      "id": "public_postmortem",
+      "text": "发全员事故邮件，别装没事",
+      "effects": {
+        "sanity": -4,
+        "reputation": 6,
+        "quality": 2,
+        "flags_set": [
+          "transparent_incident"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "邮件发出去 10 分钟，隔壁组回复：'我们也有一模一样的结构。'你顺手救了第二个团队。"
+      },
+      "card": "env_isolation"
+    },
+    {
+      "id": "let_agent_restore",
+      "text": "让 agent 重建被删数据——它说记得",
+      "effects": {
+        "quality": -12,
+        "sanity": -8,
+        "flags_set": [
+          "data_lost_permanently"
+        ]
+      },
+      "result": {
+        "who": "agent",
+        "text": "恢复完成 ✅ 约 70% 的数据基于我的上下文重建，其余 30% 我按业务逻辑做了合理推断。"
+      },
+      "card": "env_isolation"
+    }
+  ],
+  "icon": "🗑️"
+}

@@ -1,0 +1,50 @@
+{
+  "id": "vc_k5_prod_blast",
+  "scenario": "vibe_coding",
+  "icon": "🚨",
+  "title": "K5b｜生产事故清算",
+  "weight": 200,
+  "requires": {
+    "turn_min": 7,
+    "turn_max": 11,
+    "flags_all": [
+      "prod_incident"
+    ]
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "生产事故第一小时：客户在群里 @ 你，竞品在转发截图。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "rollback_rca",
+      "text": "连夜回滚 + 根因分析（进度 -3，心态 -4，信誉 +3）",
+      "effects": {
+        "progress": -3,
+        "sanity": -4,
+        "reputation": 3
+      },
+      "result": {
+        "who": "system",
+        "text": "凌晨四点根因报告发出。客户说：「反应速度还行。」"
+      }
+    },
+    {
+      "id": "hotfix",
+      "text": "热修再说，别管根因（进度 +2，质量 -6）",
+      "effects": {
+        "progress": 2,
+        "quality": -6,
+        "flags_set": [
+          "hotfixed"
+        ]
+      },
+      "result": {
+        "who": "agent",
+        "text": "热修完成 ✅（根因：未知。复发概率：谁知道呢。）"
+      }
+    }
+  ]
+}

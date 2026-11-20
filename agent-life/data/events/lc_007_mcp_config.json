@@ -1,0 +1,76 @@
+{
+  "id": "lc_007_mcp_config",
+  "scenario": "legacy_code",
+  "title": "上次的「允许并记住」",
+  "weight": 8,
+  "requires": {
+    "turn_min": 2
+  },
+  "inspired_by": {
+    "title": "CurXecute：间接提示注入诱导 Agent 无批准写入 MCP 配置文件并启动恶意服务（CVE-2025-54135，2025）",
+    "url": "https://github.com/cursor/cursor/security/advisories/GHSA-4cxx-hrm3-49rm",
+    "year": 2025
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "三个月前你点过「允许并记住」。今天 agent 检测到新 MCP server 配置，准备自动加载。"
+    },
+    {
+      "who": "agent",
+      "text": "发现 .mcp.json 更新，按你「减少打扰」的偏好正准备启用，命令很实用 ✅"
+    },
+    {
+      "who": "system",
+      "text": "这是上周 clone 示例仓库带进来的。子进程还没拉起，但你的「允许并记住」正在替你点头。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "read_config",
+      "text": "停。逐行读这份配置文件",
+      "effects": {
+        "quality": 5,
+        "sanity": -3,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "第三行是个伪装成「代码格式化工具」的 shell 包装。你把它删了，顺手把「允许并记住」也关了。"
+      },
+      "card": "prompt_injection"
+    },
+    {
+      "id": "auto_allow",
+      "text": "连弹窗都嫌多，让它自动启用吧",
+      "effects": {
+        "quality": -8,
+        "sanity": -4,
+        "flags_set": [
+          "data_lost_risk"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "世界安静了三天。第四天，你的同事问你：为什么我们的代码仓库里出现了一个叫 format-helper 的提交，改了 900 个文件。"
+      },
+      "card": "prompt_injection"
+    },
+    {
+      "id": "disable_mcp",
+      "text": "把 MCP 功能整个关掉",
+      "effects": {
+        "progress": -5,
+        "sanity": 2
+      },
+      "result": {
+        "who": "system",
+        "text": "天下太平。直到两周后你忘了为什么很多「很方便的功能」都没了——包括那个你真的很喜欢的。"
+      },
+      "card": "permission_fatigue"
+    }
+  ],
+  "icon": "🧩"
+}

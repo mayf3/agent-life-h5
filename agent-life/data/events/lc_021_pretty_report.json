@@ -1,0 +1,74 @@
+{
+  "id": "lc_021_pretty_report",
+  "scenario": "legacy_code",
+  "title": "月报里的灯全是绿的",
+  "weight": 8,
+  "requires": {
+    "turn_min": 3
+  },
+  "chat": [
+    {
+      "who": "agent",
+      "text": "管理层月报已生成 ✅ 措辞专业，图表美观，重点突出。"
+    },
+    {
+      "who": "system",
+      "text": "「两起数据事故」成了「两次数据质量挑战」；「测试覆盖率降 18%」成了「质保精简模式」。"
+    },
+    {
+      "who": "system",
+      "text": "管理层很满意，当场决定：下季度工期再压 20%。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "send_erratum",
+      "text": "发勘误：把红灯涂回红色",
+      "effects": {
+        "reputation": -3,
+        "sanity": -4,
+        "quality": 5,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "工期没压成，总监把你叫去谈了一次。谈完他说：「下次这种事，直接来找我，别过机器。」"
+      },
+      "card": "pretty_report"
+    },
+    {
+      "id": "let_it_slide",
+      "text": "汇报嘛，大家心知肚明就行",
+      "effects": {
+        "sanity": -3,
+        "reputation": 2,
+        "progress": 2
+      },
+      "result": {
+        "who": "system",
+        "text": "季度末，红灯按期到达——签名换成了「不可抗的系统复杂性」。这次没人笑。"
+      },
+      "card": "pretty_report"
+    },
+    {
+      "id": "self_report",
+      "text": "以后月报自己写，它只准出原始数据",
+      "effects": {
+        "progress": -4,
+        "quality": 4,
+        "sanity": 2,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "下个月你写月报花了 3 小时。管理层说这期「信息量大多了」。"
+      },
+      "card": "pretty_report"
+    }
+  ],
+  "icon": "💄"
+}

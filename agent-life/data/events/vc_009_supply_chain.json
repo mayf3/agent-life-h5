@@ -1,0 +1,81 @@
+{
+  "id": "vc_009_supply_chain",
+  "scenario": "vibe_coding",
+  "title": "一个「很方便」的新依赖",
+  "weight": 9,
+  "requires": {
+    "turn_min": 2
+  },
+  "inspired_by": {
+    "title": "AI 编程扩展供应链事件：过宽 token 致恶意代码进入发布版（2025，云厂商安全公告，因语法错误未执行）",
+    "url": "https://aws.amazon.com/security/security-bulletins/AWS-2025-015/",
+    "year": 2025
+  },
+  "chat": [
+    {
+      "who": "agent",
+      "text": "引入 fastjson-utils-plus（周下载 3 万）✅ 并加了自动发布钩子。"
+    },
+    {
+      "who": "system",
+      "text": "正主 fastjson-utils 周下载 300 万，山寨包上周刚注册。"
+    },
+    {
+      "who": "system",
+      "text": "其 postinstall 每次装依赖都会把 .env 静默 POST 到陌生服务器。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "remove_audit",
+      "text": "立刻移除，并审计它到底执行了什么",
+      "effects": {
+        "sanity": -8,
+        "quality": 6,
+        "money": -2,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "审计发现 postinstall 每次安装都在把 .env POST 到陌生域名——已经跑了 4 天。你的数据库密码在外面逛了 4 天。"
+      },
+      "card": "supply_chain"
+    },
+    {
+      "id": "keep_watch",
+      "text": "先留着，网络出口挂起来观察",
+      "effects": {
+        "quality": -8,
+        "sanity": -6,
+        "flags_set": [
+          "data_lost_risk"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "你盯着日志看了三天，它没动作。第四天你放松了，第五天它换了个域名继续。"
+      },
+      "card": "supply_chain"
+    },
+    {
+      "id": "dep_policy",
+      "text": "立规矩：新依赖必须过来源三查",
+      "effects": {
+        "progress": -3,
+        "quality": 5,
+        "sanity": 1,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "作者、下载量级、维护活跃度——三查清单进了你的会话模板。agent 开始嫌你烦。这是好事。"
+      },
+      "card": "supply_chain"
+    }
+  ],
+  "icon": "📦"
+}

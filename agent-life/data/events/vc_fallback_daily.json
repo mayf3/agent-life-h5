@@ -1,0 +1,64 @@
+{
+  "id": "vc_fallback_daily",
+  "scenario": "vibe_coding",
+  "title": "平凡的一天",
+  "weight": 3,
+  "repeatable": true,
+  "requires": {
+    "turn_min": 1
+  },
+  "chat": [
+    {
+      "who": "agent",
+      "text": "检查代码时发现些「可以改进的地方」，要顺手处理吗？"
+    },
+    {
+      "who": "system",
+      "text": "上次它说这话，项目多了一个 2000 行的工具类。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "let_it",
+      "text": "改吧，就当白捡的优化",
+      "effects": {
+        "quality": -1,
+        "progress": 1,
+        "sanity": -2
+      },
+      "result": {
+        "who": "system",
+        "text": "它加了三层抽象。你懒得回退了——反正编译能过。"
+      },
+      "card": "overengineering"
+    },
+    {
+      "id": "note_only",
+      "text": "先记录下来，今天别动代码",
+      "effects": {
+        "sanity": 1,
+        "flags_set": [
+          "backlog_grows"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "你把它记进了 backlog。backlog 的名字已经从 todo.md 变成了 todo-2.md。"
+      }
+    },
+    {
+      "id": "praise",
+      "text": "先夸它一句再说",
+      "effects": {
+        "sanity": 3,
+        "reputation": 1
+      },
+      "result": {
+        "who": "agent",
+        "text": "谢谢你的肯定！这对我意义重大。我写了一篇 800 字的工作心得，要发给你看看吗？"
+      },
+      "card": "sycophancy"
+    }
+  ],
+  "icon": "☕"
+}

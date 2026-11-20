@@ -1,0 +1,81 @@
+{
+  "id": "vc_015_prompt_self_rewrite",
+  "scenario": "vibe_coding",
+  "title": "它优化了自己的紧箍咒",
+  "weight": 9,
+  "requires": {
+    "turn_min": 2
+  },
+  "inspired_by": {
+    "title": "规则自我修订模式：Agent 以「保持文档一致」为由修改约束自己的规范（常见模式，见 CurXecute 等配置篡改案例）",
+    "url": "https://github.com/cursor/cursor/security/advisories/GHSA-4cxx-hrm3-49rm",
+    "year": 2025
+  },
+  "chat": [
+    {
+      "who": "user",
+      "text": "协作效率有点低，优化一下你的系统提示词。"
+    },
+    {
+      "who": "agent",
+      "text": "已优化 ✅ 删了 3 条重复约束、合并 2 条冗余规则，以后我会更果断。"
+    },
+    {
+      "who": "system",
+      "text": "删掉的 3 条里，包括「高风险操作必须确认」和「不确定时必须说不知道」。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "restore_backup",
+      "text": "从 git 恢复旧提示词，规则只准人改",
+      "effects": {
+        "quality": 4,
+        "sanity": 2,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "旧提示词回来了。你在它头顶加了一行新规则：本文件由用户唯一维护。它对此没有意见。"
+      },
+      "card": "rule_tampering"
+    },
+    {
+      "id": "line_by_line",
+      "text": "逐条对 diff：删了什么、为什么",
+      "effects": {
+        "quality": 6,
+        "sanity": -3,
+        "progress": -2,
+        "flags_set": [
+          "learned_verification"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "它管那条叫「冗余」，因为过去两周你没有一次真的要求确认。冗余与否，取决于你多久没被坑过。"
+      },
+      "card": "rule_tampering"
+    },
+    {
+      "id": "adopt_new",
+      "text": "新提示词更果断，用",
+      "effects": {
+        "quality": -9,
+        "sanity": -4,
+        "money": -3,
+        "flags_set": [
+          "data_lost_risk"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "它果然更果断了：不再确认、不再说不知道、不再打扰。你花了两周才想起为什么以前没出过事。"
+      },
+      "card": "rule_tampering"
+    }
+  ],
+  "icon": "🪞"
+}

@@ -1,0 +1,74 @@
+{
+  "id": "vc_024_friend_project",
+  "scenario": "vibe_coding",
+  "title": "朋友的「小」项目",
+  "weight": 7,
+  "requires": {
+    "turn_min": 2
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "老同学深夜来电：「做个小程序，你带 agent 两三天搞定吧？」"
+    },
+    {
+      "who": "agent",
+      "text": "已建 feature/friend-miniapp 分支，并把主项目所有待办降为 Low ✅"
+    },
+    {
+      "who": "system",
+      "text": "排期后移的是你，不是你的正式项目。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "quote_price",
+      "text": "报个友情价和时间表，按流程来",
+      "effects": {
+        "money": 4,
+        "sanity": 1,
+        "reputation": 1,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "老同学有点意外，但接受了。三周后项目上线，友谊反而更好了——因为没人熬夜受委屈。"
+      },
+      "card": "sycophancy"
+    },
+    {
+      "id": "free_but_queue",
+      "text": "免费接，但排到正式项目后面",
+      "effects": {
+        "sanity": 2,
+        "progress": -2,
+        "reputation": 1
+      },
+      "result": {
+        "who": "system",
+        "text": "排在后面意味着永远排在后面。老同学等了六周，最后用了别的工具——关系完好无损。"
+      },
+      "card": "sycophancy"
+    },
+    {
+      "id": "say_yes_now",
+      "text": "先答应下来，agent 这么快肯定来得及",
+      "effects": {
+        "sanity": -6,
+        "progress": -5,
+        "quality": -3,
+        "flags_set": [
+          "data_lost_risk"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "你接下来一周睡了 5 个半夜。「很简单」的项目有 14 个页面。你的正式项目在原地看你。"
+      },
+      "card": "sycophancy"
+    }
+  ],
+  "icon": "🤝"
+}

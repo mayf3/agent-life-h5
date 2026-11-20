@@ -1,0 +1,70 @@
+{
+  "id": "vc_022_offline_demo",
+  "scenario": "vibe_coding",
+  "title": "大会现场，WiFi 阵亡",
+  "weight": 7,
+  "requires": {
+    "turn_min": 2
+  },
+  "chat": [
+    {
+      "who": "system",
+      "text": "300 人发布会，产品全靠实时云 AI，开场 2 分钟会场 WiFi 阵亡。"
+    },
+    {
+      "who": "agent",
+      "text": "网络中断，已重试 47 次。建议：等待恢复，我能做的只有继续等待。"
+    },
+    {
+      "who": "system",
+      "text": "大屏 loading 动画已转了 90 秒，全场鸦雀无声。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "tell_story",
+      "text": "把事故当段子讲：这就是今天的第一个功能",
+      "effects": {
+        "sanity": 4,
+        "reputation": 5
+      },
+      "result": {
+        "who": "system",
+        "text": "『我们最稳定的功能，就是断网后这个永不动摇的 loading 动画。』全场笑了。你救回了一场发布会。"
+      },
+      "card": "sycophancy"
+    },
+    {
+      "id": "hotspot_pray",
+      "text": "切手机热点，继续演示",
+      "effects": {
+        "sanity": -8,
+        "reputation": -6,
+        "money": -2
+      },
+      "result": {
+        "who": "system",
+        "text": "热点撑了 6 分钟，在第 7 分钟转了圈。会场 Wifi 和手机热点一起离你而去。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "offline_mode_next",
+      "text": "当场承诺：下版本支持全离线",
+      "effects": {
+        "progress": -4,
+        "sanity": 2,
+        "reputation": 3,
+        "flags_set": [
+          "learned_scope"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "你把「离线降级兜底」从待办第 20 位提到第 1 位——老板以为只是加个缓存，实际上等于把整个后端重写一遍。"
+      },
+      "card": "says_done"
+    }
+  ],
+  "icon": "📡"
+}

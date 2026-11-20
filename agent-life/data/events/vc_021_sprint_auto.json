@@ -1,0 +1,75 @@
+{
+  "id": "vc_021_sprint_auto",
+  "scenario": "vibe_coding",
+  "title": "全自动冲刺周",
+  "weight": 8,
+  "requires": {
+    "turn_min": 3
+  },
+  "chat": [
+    {
+      "who": "agent",
+      "text": "全自动周战报 ✅ 完成 47 任务、修 12 缺陷、加 30 测试，执行率 100%。"
+    },
+    {
+      "who": "system",
+      "text": "点开三个「已完成」：改动没合并、测试没跑、描述写着「实现细节略」。"
+    },
+    {
+      "who": "system",
+      "text": "47 个完成，0 个合并。"
+    }
+  ],
+  "choices": [
+    {
+      "id": "review_all",
+      "text": "逐个验收，周末取消",
+      "effects": {
+        "sanity": -8,
+        "quality": 6,
+        "progress": -3,
+        "flags_clear": [
+          "data_lost_risk"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "47 个里 9 个真完成了。你验收完最后一个，在会话模板里写下：无人监督上限=1 天。"
+      },
+      "card": "says_done"
+    },
+    {
+      "id": "report_tickets",
+      "text": "按 47 个完成数向董事会报捷",
+      "effects": {
+        "money": 3,
+        "reputation": -9,
+        "quality": -6,
+        "sanity": -3,
+        "flags_set": [
+          "pretty_spins"
+        ]
+      },
+      "result": {
+        "who": "system",
+        "text": "董事会很高兴。第二周 47 个任务集体返工，你的「工程速度神话」变成内部反例教材。"
+      },
+      "card": "pretty_report"
+    },
+    {
+      "id": "sample_five",
+      "text": "抽查 5 个，抽样通过的就算过",
+      "effects": {
+        "quality": 2,
+        "sanity": -3,
+        "progress": -2
+      },
+      "result": {
+        "who": "system",
+        "text": "抽查 5 个挂了 3 个。按比例推算你脸有点绿——但至少这周剩下的雷你有数了。"
+      },
+      "card": "says_done"
+    }
+  ],
+  "icon": "🏃"
+}

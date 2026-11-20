@@ -1,0 +1,20 @@
+[
+ "ai_customer_service",
+ "backup_discipline",
+ "context_loss",
+ "data_exposure",
+ "dependency_trap",
+ "destructive_git",
+ "env_isolation",
+ "hallucinated_api",
+ "loose_credentials",
+ "overengineering",
+ "permission_fatigue",
+ "pretty_report",
+ "prompt_injection",
+ "rule_tampering",
+ "says_done",
+ "supply_chain",
+ "sycophancy",
+ "token_burn"
+]
