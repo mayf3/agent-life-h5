@@ -299,15 +299,21 @@
       try { localStorage.setItem("lingxu-controls", b.dataset.action || ""); } catch (err) {}
     }
   });
+  function tryAutoPick() {
+    var saved = "";
+    try { saved = localStorage.getItem("lingxu-controls") || ""; } catch (err) {}
+    if (saved === "chooseTouch") { pick("chooseTouch"); return true; }
+    if (saved === "chooseKeyboard") { pick("chooseKeyboard"); return true; }
+    var btn = document.querySelector('.control-choice[data-action="chooseTouch"], .control-choice[data-action="chooseKeyboard"]');
+    if (btn) { pick(btn.dataset.action); return true; }
+    return false;
+  }
   document.addEventListener("DOMContentLoaded", function () {
-    setTimeout(function () {
-      var saved = "";
-      try { saved = localStorage.getItem("lingxu-controls") || ""; } catch (err) {}
-      if (saved === "chooseTouch") { pick("chooseTouch"); return; }
-      if (saved === "chooseKeyboard") { pick("chooseKeyboard"); return; }
-      var detected = detect();
-      if (detected) pick(detected);
-    }, 500);
+    var attempts = 0;
+    var timer = setInterval(function () {
+      attempts++;
+      if (tryAutoPick() || attempts > 50) { clearInterval(timer); }
+    }, 300);
   });
 })();
 </script>
